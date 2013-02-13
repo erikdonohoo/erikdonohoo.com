@@ -1,0 +1,401 @@
+<html>
+<head>
+	<title>Play the Snake!</title>
+	<script src="js/jQuery.js"></script>
+	<style>
+		body {
+			width: 100%;
+			margin:0;
+			padding:0;
+			height:700px;
+			overflow:hidden;
+		}
+		div {
+			margin: 50 auto;
+			height:480px;
+			width:480px;
+		}
+		#main-canvas {
+			border: 1px solid black;
+		}
+		#scorespan {
+			display:block;
+		}
+		#highscorespan {
+			display:block;
+		}
+	</style>
+</head>
+<body>
+	<div>
+		<canvas id="main-canvas" width="384" height="384"></canvas>
+		<span id="scorespan">Your Score: <label id="score">0</label></span>
+		<span id="loadingspan">LOADING HIGH SCORES...</span>
+		<div id="highscorespan">High Score: <label id="highscore"></label><br>  By: <label id="who"></label></div>
+	</div>
+	<script>
+
+		// jQuery wrapper to prevent console fiddling
+		$(function(){
+
+			// Hide highscorespan
+			$('#highscorespan').hide();
+
+			// Functions for getting and saving high score
+			function pullHighScore() {
+				$.get('gethighscore.php',function(data){
+					var bestplayer = eval('(' + data + ')');
+					$('#highscore').html(bestplayer.score);
+					$('#who').html(bestplayer.name);
+
+					// Show/Hide spans
+					$('#highscorespan').show();
+					$('#loadingspan').hide();
+				});
+			}
+
+			function newHighScore() {
+
+				$.get('gethighscore.php',function(data){
+					var bestplayer = eval('(' + data + ')');
+					if (bestplayer.score < SCORE) {
+						// new high score
+						var retVal = prompt("Congrats on the new high score! Enter your name : ", "your name here");
+						saveNewScore(retVal,SCORE);
+					}
+				});
+			}
+
+			function saveNewScore(name, score) {
+
+				var scorestuff = {'name' : name, 'score' : score, 'hash' : DBHASH};
+				$.post('savehighscore.php',scorestuff, function(string) {
+					console.log(string);
+				});
+			}
+
+			var DBHASH;
+
+			function getDBHash() {
+
+				$.get('getdbhash.php', function(data) {
+					DBHASH = data;
+				});
+			}
+
+			// pull high score
+			pullHighScore();
+			getDBHash();
+
+			// Get the canvas context
+			var c = document.getElementById('main-canvas');
+			var canvas = c.getContext('2d');
+
+			// Define Position Struct
+			function Position(x,y) {
+				this.x = x;
+				this.y = y;
+			}
+
+			// Constants
+			var BOARD_SIZE = 24;  // Must be even
+			var LEFT = new Position(-1,0);
+			var RIGHT = new Position(1,0);
+			var UP = new Position(0,-1);
+			var DOWN = new Position(0,1)
+			var SNAKE_PIECE_SIZE = 10;
+			var GAP_SIZE = 3;
+			var SQUARE_SIZE = 16;
+			var STARTING_CENTER = (BOARD_SIZE / 2) - 1;
+			var KEYBOARD_UP = 38;
+			var KEYBOARD_DOWN = 40;
+			var KEYBOARD_LEFT = 37;
+			var KEYBOARD_RIGHT = 39;
+			var ENTER = 13;
+			var GAME_SPEED;
+			var MAX_SPEED = 50;
+			var SPEED_CHANGE_INTERVAL = 10;
+			var CUR_FOOD;
+			var gameover = false;
+			var timer;
+			var snake; // game snake
+			var NEXT_DIRECTION; // snakes next direction
+			var SCORE = 0;
+			var canGoThroughWalls = true;
+			var SNAKE_HEAD_COLOR = '#A80D0D';
+			var SNAKE_DEFAULT_COLOR = '#1D7E25';
+
+			// Array to hold all objects on screen
+			var visible_pieces = new Array();
+
+			// Define Food
+			function Food(x,y) {
+
+				this.position = new Position(x,y);
+
+				// Draw food
+				this.draw = function() {
+
+					canvas.fillStyle = '#333333';
+					canvas.strokeRect((SQUARE_SIZE * this.position.x) + GAP_SIZE, (SQUARE_SIZE * this.position.y) + GAP_SIZE, SNAKE_PIECE_SIZE, SNAKE_PIECE_SIZE);
+				}
+			}
+
+			// Define SnakePiece
+			function SnakePiece(x,y) {
+
+				this.position = new Position(x,y);
+				this.color = SNAKE_DEFAULT_COLOR;
+
+				// Draw an individual snake piece
+				this.draw = function() {
+
+					canvas.fillStyle = this.color;
+					canvas.fillRect((SQUARE_SIZE * this.position.x) + GAP_SIZE, (SQUARE_SIZE * this.position.y) + GAP_SIZE, SNAKE_PIECE_SIZE, SNAKE_PIECE_SIZE);
+				}
+			}
+
+			function resetColor(pieces) {
+
+				for (var i = 0; i < pieces.length; i++) {
+					pieces[i].color = SNAKE_DEFAULT_COLOR;
+				}
+			}
+
+			// Define the snake
+			function Snake() {
+
+				this.direction = RIGHT;
+				this.snakePieces = new Array();
+
+				// End of Array, is actually beginning of snake
+				this.snakePieces.push(new SnakePiece(STARTING_CENTER - 2,STARTING_CENTER));
+				this.snakePieces.push(new SnakePiece(STARTING_CENTER - 1,STARTING_CENTER));
+				var head = new SnakePiece(STARTING_CENTER,STARTING_CENTER);
+				head.color = SNAKE_HEAD_COLOR;
+				this.snakePieces.push(head);
+
+				// Draws the snake to the board
+				this.draw = function(){
+					
+					for (var i = 0; i < this.snakePieces.length; i++) {
+						this.snakePieces[i].draw();
+					}
+				}
+
+				this.move = function(){
+
+					// Get the piece at the beginning, push it on the front of the array
+					// Change its position based on direction
+					var back = new SnakePiece(this.snakePieces[0].position.x, this.snakePieces[0].position.y);
+					back.position.x = this.snakePieces[this.snakePieces.length - 1].position.x;
+					back.position.y = this.snakePieces[this.snakePieces.length - 1].position.y;
+					back.position.x += this.direction.x;
+					back.position.y += this.direction.y;
+
+					if (canGoThroughWalls) {
+						canGoThroughWalls = false;
+						if (this.hitsWall(back.position.x,back.position.y)) {
+							if (back.position.x > BOARD_SIZE - 1) { // Hit right side
+								back.position.x = 0;
+							}
+							if (back.position.x < 0) { // Hit left side
+								back.position.x = BOARD_SIZE - 1;
+							}
+							if (back.position.y > BOARD_SIZE - 1) { // Hit bottom
+								back.position.y = 0;
+							}
+							if (back.position.y < 0) {
+								back.position.y = BOARD_SIZE - 1;
+							}
+						}
+						canGoThroughWalls = true;
+					}
+
+					resetColor(this.snakePieces);
+					back.color = SNAKE_HEAD_COLOR;
+					this.snakePieces.push(back);
+
+					// Check if I eat a food
+					if (CUR_FOOD.position.x == back.position.x && CUR_FOOD.position.y == back.position.y) {
+
+						// We need to create a new food
+						// We don't remove first piece, so snake grows longer
+						visible_pieces.splice(visible_pieces.indexOf(CUR_FOOD));
+						CUR_FOOD = generateRandomFood();
+						visible_pieces.push(CUR_FOOD);
+						updateScore();
+
+						// Speed up
+						if (GAME_SPEED > MAX_SPEED)
+							GAME_SPEED -= SPEED_CHANGE_INTERVAL;
+
+					} else {
+
+						// Remove first piece
+						this.snakePieces.shift();
+					}
+
+					// Check if hits wall or hits itself
+					var newx = back.position.x;
+					var newy = back.position.y;
+					if (this.hitsWall(newx,newy) || this.hitsSelf(newx,newy)) {
+
+						// Game over
+						gameover = true;
+					}
+					
+				}
+
+				this.hitsWall = function(x,y) {
+
+					if (canGoThroughWalls)
+						return false;
+
+					return (x < 0 || x > BOARD_SIZE - 1 || y > BOARD_SIZE - 1 || y < 0);
+				}
+
+				this.hitsSelf = function(x,y) {
+
+					for (var i = this.snakePieces.length - 2; i >= 0; i--) {
+
+						if (this.snakePieces[i].position.x == x && this.snakePieces[i].position.y == y)
+							return true;
+					}
+
+					return false;
+				}
+			}
+
+			function redraw() {
+
+				canvas.clearRect(0,0,BOARD_SIZE * SQUARE_SIZE, BOARD_SIZE * SQUARE_SIZE);
+				for (var i = 0; i < visible_pieces.length; i++) {
+					visible_pieces[i].draw();
+				}
+			}
+
+			function updateScore() {
+				SCORE++;
+				$('#score').html(SCORE);
+			}
+
+			function snakeMove() {
+				
+				if (snake.direction.x == UP.x && snake.direction.y == UP.y && NEXT_DIRECTION.x != DOWN.x && NEXT_DIRECTION.y != DOWN.y)
+					snake.direction = NEXT_DIRECTION;
+
+				if (snake.direction.x == DOWN.x && snake.direction.y == DOWN.y && NEXT_DIRECTION.x != UP.x && NEXT_DIRECTION.y != UP.y)
+					snake.direction = NEXT_DIRECTION;
+
+				if (snake.direction.x == LEFT.x && snake.direction.y == LEFT.y && NEXT_DIRECTION.x != RIGHT.x && NEXT_DIRECTION.y != RIGHT.y)
+					snake.direction = NEXT_DIRECTION;
+
+				if (snake.direction.x == RIGHT.x && snake.direction.y == RIGHT.y && NEXT_DIRECTION.x != LEFT.x && NEXT_DIRECTION.y != LEFT.y)
+					snake.direction = NEXT_DIRECTION;
+
+				snake.move();
+
+				if (!gameover) {
+					redraw();
+					timer = setTimeout(function() { snakeMove(); } , GAME_SPEED);
+				} else {
+
+					gameOver();
+				}
+			}
+
+			function snakeAtPosition(pos) {
+
+				var conflict = false;
+
+				for (var i = 0; i < snake.snakePieces.length; i++) {
+
+					if (snake.snakePieces[i].position.x == pos.x && snake.snakePieces[i].position.y == pos.y) {
+						conflict == true;
+						break;
+					}
+				}
+
+				return conflict;
+			}
+
+			function generateRandomFood() {
+
+				var x = Math.floor((Math.random() * BOARD_SIZE));
+				var y = Math.floor((Math.random() * BOARD_SIZE));
+
+				var pos = new Position(x,y);
+
+				while(snakeAtPosition(pos)) {
+
+					x = Math.floor((Math.random() * BOARD_SIZE));
+					y = Math.floor((Math.random() * BOARD_SIZE));
+					pos = new Position(x,y);
+				}
+
+				return new Food(pos.x, pos.y);
+			}
+
+			function gameOver() {
+
+				canvas.clearRect(0,0,BOARD_SIZE * SQUARE_SIZE, BOARD_SIZE * SQUARE_SIZE);
+				canvas.font = "26px Arial";
+				canvas.fillText("Game Over", SQUARE_SIZE * (BOARD_SIZE / 6), SQUARE_SIZE * 5);
+				canvas.font = "17px Arial";
+				canvas.fillText("Press Enter to Play again", SQUARE_SIZE * (BOARD_SIZE / 12), SQUARE_SIZE * 7)
+				newHighScore();
+			}
+
+			function startGame() {
+
+				snake = new Snake();
+				CUR_FOOD = generateRandomFood();
+				NEXT_DIRECTION = RIGHT;
+				GAME_SPEED = 300;
+				visible_pieces = new Array();
+				visible_pieces.push(snake);
+				visible_pieces.push(CUR_FOOD);
+				gameover = false;
+				SCORE = 0;
+				$('#score').html(0);
+				redraw();
+				$('#highscorespan').hide();
+				$('#loadingspan').show();
+				pullHighScore();
+				timer = setTimeout(function() { snakeMove(); } , 2000);
+			}
+
+			// Set up Game
+			visible_pieces.push(snake);
+			visible_pieces.push(CUR_FOOD);
+
+			// Add event listeners
+			$(document).keydown(function(e){
+				if (e.which == KEYBOARD_RIGHT && snake.direction != LEFT) {
+					NEXT_DIRECTION = RIGHT;
+				}
+				else if (e.which == KEYBOARD_LEFT && snake.direction != RIGHT) {
+					NEXT_DIRECTION = LEFT;
+				}
+				else if (e.which == KEYBOARD_DOWN && snake.direction != UP) {
+					NEXT_DIRECTION = DOWN;
+				}
+				else if (e.which == KEYBOARD_UP && snake.direction != DOWN) {
+					NEXT_DIRECTION = UP;
+				} 
+				else if (e.which == ENTER && gameover) {
+					startGame();
+				}
+			});
+
+			// start game
+			startGame();
+		});
+
+// $(function (){$("\x23\x68\x69\x67\x68\x73\x63\x6F\x72\x65\x73\x70\x61\x6E")["\x68\x69\x64\x65"]();function _0x4f29x0(){$["\x67\x65\x74"]("\x67\x65\x74\x68\x69\x67\x68\x73\x63\x6F\x72\x65\x2E\x70\x68\x70",function (_0x4f29x1){var _0x4f29x2=eval("\x28"+_0x4f29x1+"\x29");$("\x23\x68\x69\x67\x68\x73\x63\x6F\x72\x65")["\x68\x74\x6D\x6C"](_0x4f29x2["\x73\x63\x6F\x72\x65"]);$("\x23\x77\x68\x6F")["\x68\x74\x6D\x6C"](_0x4f29x2["\x6E\x61\x6D\x65"]);$("\x23\x68\x69\x67\x68\x73\x63\x6F\x72\x65\x73\x70\x61\x6E")["\x73\x68\x6F\x77"]();$("\x23\x6C\x6F\x61\x64\x69\x6E\x67\x73\x70\x61\x6E")["\x68\x69\x64\x65"]();} );} ;function _0x4f29x3(){$["\x67\x65\x74"]("\x67\x65\x74\x68\x69\x67\x68\x73\x63\x6F\x72\x65\x2E\x70\x68\x70",function (_0x4f29x1){var _0x4f29x2=eval("\x28"+_0x4f29x1+"\x29");if(_0x4f29x2["\x73\x63\x6F\x72\x65"]<_0x4f29x27){var _0x4f29x4=prompt("\x43\x6F\x6E\x67\x72\x61\x74\x73\x20\x6F\x6E\x20\x74\x68\x65\x20\x6E\x65\x77\x20\x68\x69\x67\x68\x20\x73\x63\x6F\x72\x65\x21\x20\x45\x6E\x74\x65\x72\x20\x79\x6F\x75\x72\x20\x6E\x61\x6D\x65\x20\x3A\x20","\x79\x6F\x75\x72\x20\x6E\x61\x6D\x65\x20\x68\x65\x72\x65");_0x4f29x5(_0x4f29x4,_0x4f29x27);} ;} );} ;function _0x4f29x5(_0x4f29x6,_0x4f29x7){var _0x4f29x8={"\x6E\x61\x6D\x65":_0x4f29x6,"\x73\x63\x6F\x72\x65":_0x4f29x7,"\x68\x61\x73\x68":_0x4f29xa};$["\x70\x6F\x73\x74"]("\x73\x61\x76\x65\x68\x69\x67\x68\x73\x63\x6F\x72\x65\x2E\x70\x68\x70",_0x4f29x8,function (_0x4f29x9){console["\x6C\x6F\x67"](_0x4f29x9);} );} ;var _0x4f29xa;function _0x4f29xb(){$["\x67\x65\x74"]("\x67\x65\x74\x64\x62\x68\x61\x73\x68\x2E\x70\x68\x70",function (_0x4f29x1){_0x4f29xa=_0x4f29x1;} );} ;_0x4f29x0();_0x4f29xb();var _0x4f29xc=document["\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64"]("\x6D\x61\x69\x6E\x2D\x63\x61\x6E\x76\x61\x73");var _0x4f29xd=_0x4f29xc["\x67\x65\x74\x43\x6F\x6E\x74\x65\x78\x74"]("\x32\x64");function _0x4f29xe(_0x4f29xf,_0x4f29x10){this["\x78"]=_0x4f29xf;this["\x79"]=_0x4f29x10;} ;var _0x4f29x11=24;var _0x4f29x12= new _0x4f29xe(-1,0);var _0x4f29x13= new _0x4f29xe(1,0);var _0x4f29x14= new _0x4f29xe(0,-1);var _0x4f29x15= new _0x4f29xe(0,1);var _0x4f29x16=10;var _0x4f29x17=3;var _0x4f29x18=16;var _0x4f29x19=(_0x4f29x11/2)-1;var _0x4f29x1a=38;var _0x4f29x1b=40;var _0x4f29x1c=37;var _0x4f29x1d=39;var _0x4f29x1e=13;var _0x4f29x1f;var _0x4f29x20=50;var _0x4f29x21=10;var _0x4f29x22;var _0x4f29x23=false;var _0x4f29x24;var _0x4f29x25;var _0x4f29x26;var _0x4f29x27=0;var _0x4f29x28=true;var _0x4f29x29="\x23\x41\x38\x30\x44\x30\x44";var _0x4f29x2a="\x23\x31\x44\x37\x45\x32\x35";var _0x4f29x2b= new Array();function _0x4f29x2c(_0x4f29xf,_0x4f29x10){this["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]= new _0x4f29xe(_0x4f29xf,_0x4f29x10);this["\x64\x72\x61\x77"]=function (){_0x4f29xd["\x66\x69\x6C\x6C\x53\x74\x79\x6C\x65"]="\x23\x33\x33\x33\x33\x33\x33";_0x4f29xd["\x73\x74\x72\x6F\x6B\x65\x52\x65\x63\x74"]((_0x4f29x18*this["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"])+_0x4f29x17,(_0x4f29x18*this["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"])+_0x4f29x17,_0x4f29x16,_0x4f29x16);} ;} ;function _0x4f29x2d(_0x4f29xf,_0x4f29x10){this["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]= new _0x4f29xe(_0x4f29xf,_0x4f29x10);this["\x63\x6F\x6C\x6F\x72"]=_0x4f29x2a;this["\x64\x72\x61\x77"]=function (){_0x4f29xd["\x66\x69\x6C\x6C\x53\x74\x79\x6C\x65"]=this["\x63\x6F\x6C\x6F\x72"];_0x4f29xd["\x66\x69\x6C\x6C\x52\x65\x63\x74"]((_0x4f29x18*this["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"])+_0x4f29x17,(_0x4f29x18*this["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"])+_0x4f29x17,_0x4f29x16,_0x4f29x16);} ;} ;function _0x4f29x2e(_0x4f29x2f){for(var _0x4f29x30=0;_0x4f29x30<_0x4f29x2f["\x6C\x65\x6E\x67\x74\x68"];_0x4f29x30++){_0x4f29x2f[_0x4f29x30]["\x63\x6F\x6C\x6F\x72"]=_0x4f29x2a;} ;} ;function _0x4f29x31(){this["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]=_0x4f29x13;this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]= new Array();this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x70\x75\x73\x68"]( new _0x4f29x2d(_0x4f29x19-2,_0x4f29x19));this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x70\x75\x73\x68"]( new _0x4f29x2d(_0x4f29x19-1,_0x4f29x19));var _0x4f29x32= new _0x4f29x2d(_0x4f29x19,_0x4f29x19);_0x4f29x32["\x63\x6F\x6C\x6F\x72"]=_0x4f29x29;this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x70\x75\x73\x68"](_0x4f29x32);this["\x64\x72\x61\x77"]=function (){for(var _0x4f29x30=0;_0x4f29x30<this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x6C\x65\x6E\x67\x74\x68"];_0x4f29x30++){this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"][_0x4f29x30]["\x64\x72\x61\x77"]();} ;} ;this["\x6D\x6F\x76\x65"]=function (){var _0x4f29x33= new _0x4f29x2d(this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"][0]["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"],this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"][0]["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]);_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]=this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"][this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x6C\x65\x6E\x67\x74\x68"]-1]["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"];_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]=this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"][this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x6C\x65\x6E\x67\x74\x68"]-1]["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"];_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]+=this["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x78"];_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]+=this["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x79"];if(_0x4f29x28){_0x4f29x28=false;if(this["\x68\x69\x74\x73\x57\x61\x6C\x6C"](_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"],_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"])){if(_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]>_0x4f29x11-1){_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]=0;} ;if(_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]<0){_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]=_0x4f29x11-1;} ;if(_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]>_0x4f29x11-1){_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]=0;} ;if(_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]<0){_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]=_0x4f29x11-1;} ;} ;_0x4f29x28=true;} ;_0x4f29x2e(this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]);_0x4f29x33["\x63\x6F\x6C\x6F\x72"]=_0x4f29x29;this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x70\x75\x73\x68"](_0x4f29x33);if(_0x4f29x22["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]==_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]&&_0x4f29x22["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]==_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]){_0x4f29x2b["\x73\x70\x6C\x69\x63\x65"](_0x4f29x2b["\x69\x6E\x64\x65\x78\x4F\x66"](_0x4f29x22));_0x4f29x22=_0x4f29x3c();_0x4f29x2b["\x70\x75\x73\x68"](_0x4f29x22);_0x4f29x37();if(_0x4f29x1f>_0x4f29x20){_0x4f29x1f-=_0x4f29x21;} ;} else {this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x73\x68\x69\x66\x74"]();} ;var _0x4f29x34=_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"];var _0x4f29x35=_0x4f29x33["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"];if(this["\x68\x69\x74\x73\x57\x61\x6C\x6C"](_0x4f29x34,_0x4f29x35)||this["\x68\x69\x74\x73\x53\x65\x6C\x66"](_0x4f29x34,_0x4f29x35)){_0x4f29x23=true;} ;} ;this["\x68\x69\x74\x73\x57\x61\x6C\x6C"]=function (_0x4f29xf,_0x4f29x10){if(_0x4f29x28){return false;} ;return (_0x4f29xf<0||_0x4f29xf>_0x4f29x11-1||_0x4f29x10>_0x4f29x11-1||_0x4f29x10<0);} ;this["\x68\x69\x74\x73\x53\x65\x6C\x66"]=function (_0x4f29xf,_0x4f29x10){for(var _0x4f29x30=this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x6C\x65\x6E\x67\x74\x68"]-2;_0x4f29x30>=0;_0x4f29x30--){if(this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"][_0x4f29x30]["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]==_0x4f29xf&&this["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"][_0x4f29x30]["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]==_0x4f29x10){return true;} ;} ;return false;} ;} ;function _0x4f29x36(){_0x4f29xd["\x63\x6C\x65\x61\x72\x52\x65\x63\x74"](0,0,_0x4f29x11*_0x4f29x18,_0x4f29x11*_0x4f29x18);for(var _0x4f29x30=0;_0x4f29x30<_0x4f29x2b["\x6C\x65\x6E\x67\x74\x68"];_0x4f29x30++){_0x4f29x2b[_0x4f29x30]["\x64\x72\x61\x77"]();} ;} ;function _0x4f29x37(){_0x4f29x27++;$("\x23\x73\x63\x6F\x72\x65")["\x68\x74\x6D\x6C"](_0x4f29x27);} ;function _0x4f29x38(){if(_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x78"]==_0x4f29x14["\x78"]&&_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x79"]==_0x4f29x14["\x79"]&&_0x4f29x26["\x78"]!=_0x4f29x15["\x78"]&&_0x4f29x26["\x79"]!=_0x4f29x15["\x79"]){_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]=_0x4f29x26;} ;if(_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x78"]==_0x4f29x15["\x78"]&&_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x79"]==_0x4f29x15["\x79"]&&_0x4f29x26["\x78"]!=_0x4f29x14["\x78"]&&_0x4f29x26["\x79"]!=_0x4f29x14["\x79"]){_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]=_0x4f29x26;} ;if(_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x78"]==_0x4f29x12["\x78"]&&_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x79"]==_0x4f29x12["\x79"]&&_0x4f29x26["\x78"]!=_0x4f29x13["\x78"]&&_0x4f29x26["\x79"]!=_0x4f29x13["\x79"]){_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]=_0x4f29x26;} ;if(_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x78"]==_0x4f29x13["\x78"]&&_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]["\x79"]==_0x4f29x13["\x79"]&&_0x4f29x26["\x78"]!=_0x4f29x12["\x78"]&&_0x4f29x26["\x79"]!=_0x4f29x12["\x79"]){_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]=_0x4f29x26;} ;_0x4f29x25["\x6D\x6F\x76\x65"]();if(!_0x4f29x23){_0x4f29x36();_0x4f29x24=setTimeout(function (){_0x4f29x38();} ,_0x4f29x1f);} else {_0x4f29x3d();} ;} ;function _0x4f29x39(_0x4f29x3a){var _0x4f29x3b=false;for(var _0x4f29x30=0;_0x4f29x30<_0x4f29x25["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"]["\x6C\x65\x6E\x67\x74\x68"];_0x4f29x30++){if(_0x4f29x25["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"][_0x4f29x30]["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x78"]==_0x4f29x3a["\x78"]&&_0x4f29x25["\x73\x6E\x61\x6B\x65\x50\x69\x65\x63\x65\x73"][_0x4f29x30]["\x70\x6F\x73\x69\x74\x69\x6F\x6E"]["\x79"]==_0x4f29x3a["\x79"]){_0x4f29x3b==true;break ;} ;} ;return _0x4f29x3b;} ;function _0x4f29x3c(){var _0x4f29xf=Math["\x66\x6C\x6F\x6F\x72"]((Math["\x72\x61\x6E\x64\x6F\x6D"]()*_0x4f29x11));var _0x4f29x10=Math["\x66\x6C\x6F\x6F\x72"]((Math["\x72\x61\x6E\x64\x6F\x6D"]()*_0x4f29x11));var _0x4f29x3a= new _0x4f29xe(_0x4f29xf,_0x4f29x10);while(_0x4f29x39(_0x4f29x3a)){_0x4f29xf=Math["\x66\x6C\x6F\x6F\x72"]((Math["\x72\x61\x6E\x64\x6F\x6D"]()*_0x4f29x11));_0x4f29x10=Math["\x66\x6C\x6F\x6F\x72"]((Math["\x72\x61\x6E\x64\x6F\x6D"]()*_0x4f29x11));_0x4f29x3a= new _0x4f29xe(_0x4f29xf,_0x4f29x10);} ;return  new _0x4f29x2c(_0x4f29x3a["\x78"],_0x4f29x3a["\x79"]);} ;function _0x4f29x3d(){_0x4f29xd["\x63\x6C\x65\x61\x72\x52\x65\x63\x74"](0,0,_0x4f29x11*_0x4f29x18,_0x4f29x11*_0x4f29x18);_0x4f29xd["\x66\x6F\x6E\x74"]="\x32\x36\x70\x78\x20\x41\x72\x69\x61\x6C";_0x4f29xd["\x66\x69\x6C\x6C\x54\x65\x78\x74"]("\x47\x61\x6D\x65\x20\x4F\x76\x65\x72",_0x4f29x18*(_0x4f29x11/6),_0x4f29x18*5);_0x4f29xd["\x66\x6F\x6E\x74"]="\x31\x37\x70\x78\x20\x41\x72\x69\x61\x6C";_0x4f29xd["\x66\x69\x6C\x6C\x54\x65\x78\x74"]("\x50\x72\x65\x73\x73\x20\x45\x6E\x74\x65\x72\x20\x74\x6F\x20\x50\x6C\x61\x79\x20\x61\x67\x61\x69\x6E",_0x4f29x18*(_0x4f29x11/12),_0x4f29x18*7);_0x4f29x3();} ;function _0x4f29x3e(){_0x4f29x25= new _0x4f29x31();_0x4f29x22=_0x4f29x3c();_0x4f29x26=_0x4f29x13;_0x4f29x1f=300;_0x4f29x2b= new Array();_0x4f29x2b["\x70\x75\x73\x68"](_0x4f29x25);_0x4f29x2b["\x70\x75\x73\x68"](_0x4f29x22);_0x4f29x23=false;_0x4f29x27=0;$("\x23\x73\x63\x6F\x72\x65")["\x68\x74\x6D\x6C"](0);_0x4f29x36();$("\x23\x68\x69\x67\x68\x73\x63\x6F\x72\x65\x73\x70\x61\x6E")["\x68\x69\x64\x65"]();$("\x23\x6C\x6F\x61\x64\x69\x6E\x67\x73\x70\x61\x6E")["\x73\x68\x6F\x77"]();_0x4f29x0();_0x4f29x24=setTimeout(function (){_0x4f29x38();} ,2000);} ;_0x4f29x2b["\x70\x75\x73\x68"](_0x4f29x25);_0x4f29x2b["\x70\x75\x73\x68"](_0x4f29x22);$(document)["\x6B\x65\x79\x64\x6F\x77\x6E"](function (_0x4f29x3f){if(_0x4f29x3f["\x77\x68\x69\x63\x68"]==_0x4f29x1d&&_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]!=_0x4f29x12){_0x4f29x26=_0x4f29x13;} else {if(_0x4f29x3f["\x77\x68\x69\x63\x68"]==_0x4f29x1c&&_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]!=_0x4f29x13){_0x4f29x26=_0x4f29x12;} else {if(_0x4f29x3f["\x77\x68\x69\x63\x68"]==_0x4f29x1b&&_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]!=_0x4f29x14){_0x4f29x26=_0x4f29x15;} else {if(_0x4f29x3f["\x77\x68\x69\x63\x68"]==_0x4f29x1a&&_0x4f29x25["\x64\x69\x72\x65\x63\x74\x69\x6F\x6E"]!=_0x4f29x15){_0x4f29x26=_0x4f29x14;} else {if(_0x4f29x3f["\x77\x68\x69\x63\x68"]==_0x4f29x1e&&_0x4f29x23){_0x4f29x3e();} ;} ;} ;} ;} ;} );_0x4f29x3e();} );
+
+
+	</script>
+</body>
+</html>
