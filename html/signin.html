@@ -1,0 +1,25 @@
+<h2>Sign in</h2>
+<hr>
+<form class="form-horizontal" ng-submit="signin()">
+	<div class="control-group">
+		<label class="control-label" for="inputEmail">Username </label>
+		<div class="controls">
+			<input type="text" id="inputUsername" placeholder="Username" ng-model="username" required>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="inputPassword">Password</label>
+		<div class="controls">
+			<input type="password" id="inputPassword" placeholder="Password" ng-model="password" required>
+		</div>
+	</div>
+	<div class="control-group">
+		<div class="controls">
+			<div class="alert alert-danger" ng-show="error">
+				<button type="button" class="close" ng-click="error = false">&times;</button>
+				<strong>Error!</strong> Not a valid login
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</div>
+	</div>
+</form>

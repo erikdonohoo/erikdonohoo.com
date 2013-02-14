@@ -34,11 +34,8 @@
 	    hr {
 	    	border-bottom:1px solid rgb(185, 185, 185);
 	    }
-	    #profile-img {
-	    	margin-right:20px;
-	    }
 	    .profile-welcome {
-	    	margin-left:20px;
+	    	max-width:140px;
 	    }
 	    .credit {
 	    	margin:20px 0;
@@ -147,7 +144,7 @@
 						<div class="visible-phone phone-signin pull-left">
 							<button class="btn btn-primary pull-right" ng-show="!loggedIn" ng-click="toggleLogIn(true)">Log in</button>
 							<button class="btn btn-danger pull-right" ng-show="loggedIn" ng-click="toggleLogIn(false)">Sign out</button>
-							<h5 class="pull-right" ng-show="loggedIn">Welcome, <strong class="text-info">{{user.name}}&nbsp;&nbsp;</strong></h5>
+							<h5 class="pull-right" ng-show="loggedIn">Welcome, <strong class="text-info">{{user.attributes.username}}&nbsp;&nbsp;</strong></h5>
 						</div>
 					</div>
 				</div>
@@ -164,15 +161,15 @@
 							<li><a class="bg-text" href="http://invaderz.erikdonohoo.com">invaderz</a></li>
 							<li class="nav-header">erikdonohoo.com Account</li>
 							<li ng-class="{active: pageName == 'register'}"><a class="bg-text" href="#/register">register</a></li>
-							<li><a class="bg-text" ng-click="toggleLogIn(true);">sign in</a></li>
+							<li ng-class="{active: pageName == 'signin'}"><a href="#/signin" class="bg-text">sign in</a></li>
 							<li><a class="bg-text" href="#/about/account">whats this?</a></li>
 							<li class="divider"></li>
 							<li ng-show="loggedIn" class="long-li">
-								<img class="img-polaroid pull-right" id="profile-img" ng-src="{{user.imgsrc}}" />
+								<img class="img-polaroid pull-right" id="profile-img" ng-src="{{photourl}}" />
 								<div class="pull-left profile-welcome">
 									<h4>Welcome,</h4>
-									<p class="text-info">{{user.name}}</p>
-									<button class="btn btn-danger" ng-click="toggleLogIn(false);">Sign out</button>
+									<p class="text-info">{{user.attributes.username}}</p>
+									<button class="btn btn-danger" ng-click="signout();">Sign out</button>
 								</div>
 							</li>
 						</ul>
