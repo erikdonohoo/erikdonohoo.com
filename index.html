@@ -2,11 +2,54 @@
 <html>
 <head>
 	<title>erikdonohoo</title>
+
+	<!-- Bootstrap -->
+	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+
+	<style>
+		body {
+			padding-top:60px;
+			padding-bottom:40px;
+		}
+	</style>
+
 </head>
 <body>
-	<h1>erikdonohoo.com</h1>
-	<h2><a href="http://snake.erikdonohoo.com">Snake</a></h2>
-	<h2><a href="http://mario.erikdonohoo.com">Mario</a></h2>
-	<h2><a href="http://invaderz.erikdonohoo.com">Invaderz</a></h2>
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container-fluid">
+				<a class="brand" href="#/">erikdonohoo.com</a>
+				<div class="nav-collapse collapse">
+					<ul class="nav">
+						<li class="active">
+							<a href="#/">Home</a>
+						</li>
+						<li>
+							<a href="#/games">Games</a>
+						</li>
+						<li>
+							<a href="#/about">About</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span3">
+				<h3><a href="http://snake.erikdonohoo.com">snake</a></h3>
+				<h3><a href="http://mario.erikdonohoo.com">mario</a></h3>
+				<h3><a href="http://invaderz.erikdonohoo.com">invaderz</a></h3>
+			</div>
+			<div class="span9">
+			</div>
+		</div>
+	</div>
+
+	<!-- Scripts -->
+	<script src="bootstrap/js/jquery.min.js"></script>
+	<script src="bootstrap/js/bootstrap.min.js"></script>
+
 </body>
 </html>
