@@ -24,6 +24,12 @@ app.run(function($rootScope) {
  	$rootScope.setPageName = function(name) {
  		$rootScope.pageName = name;
  	}
+
+ 	// Logged In
+ 	$rootScope.loggedIn = false;
+ 	$rootScope.toggleLogIn = function(bool) {
+ 		$rootScope.loggedIn = bool;
+ 	}
 });
 
 //*****************************************************************************

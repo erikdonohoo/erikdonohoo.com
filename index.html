@@ -41,6 +41,9 @@
 	    .credit {
 	    	margin:20px 0;
 	    }
+	    .hide {
+	    	display:none;
+	    }
 
 		/* Sticky footer styles
 		-------------------------------------------------- */
@@ -120,15 +123,17 @@
 							<li><a class="bg-text" href="http://invaderz.erikdonohoo.com">invaderz</a></li>
 							<li class="nav-header">erikdonohoo.com Account</li>
 							<li><a class="bg-text" href="#/register">register</a></li>
-							<li><a class="bg-text" href="#/signin">sign in</a></li>
+							<li><a class="bg-text" href="#" ng-click="toggleLogIn(true);">sign in</a></li>
 							<li><a class="bg-text" href="#/about/account">whats this?</a></li>
 							<li class="divider"></li>
 						</ul>
-						<img class="img-polaroid pull-right" id="profile-img" />
-						<div class="pull-left profile-welcome">
-							<h4>Welcome,</h4>
-							<p class="text-info">Erik Donohoo</p>
-							<button class="btn btn-danger">Sign out</button>
+						<div ng-show="loggedIn">
+							<img class="img-polaroid pull-right" id="profile-img" />
+							<div class="pull-left profile-welcome">
+								<h4>Welcome,</h4>
+								<p class="text-info">Erik Donohoo</p>
+								<button class="btn btn-danger" ng-click="toggleLogIn(false);">Sign out</button>
+							</div>
 						</div>
 					</div>
 				</div>
