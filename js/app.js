@@ -8,6 +8,7 @@ app.config(['$routeProvider', function($routeProvider,$locationProvider) {
   	  when('/', {templateUrl: 'html/home.html', controller: HomeCtrl}).
   	  when('/games', {templateUrl: 'html/games.html', controller: GamesCtrl}).
   	  when('/about', {templateUrl: 'html/about.html', controller: AboutCtrl}).
+  	  when('/register', {templateUrl: 'html/register.html', controller: RegisterCtrl}).
       otherwise({redirectTo: '/'});
 }]);
 
@@ -34,6 +35,7 @@ app.run(function($rootScope) {
  	// User
  	$rootScope.user = {};
  	$rootScope.user.name = 'Cool User';
+ 	$rootScope.user.imgsrc = 'http://placehold.it/100X100';
 });
 
 //*****************************************************************************
@@ -58,4 +60,15 @@ function GamesCtrl($scope, $routeParams, $location) {
 function AboutCtrl($scope, $routeParams, $location) {
 
 	$scope.setPageName('about');
+}
+
+//*****************************************************************************
+//  REGISTER CTRL
+//*****************************************************************************
+function RegisterCtrl($scope, $routeParams, $location) {
+
+	$scope.setPageName('register');
+
+	// Set up tooltip
+	$('#gravatar-tip').tooltip();
 }
