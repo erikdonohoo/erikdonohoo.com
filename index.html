@@ -10,9 +10,22 @@
 		body {
 			padding-top:60px;
 			padding-bottom:40px;
+			background: rgba(74, 167, 167, 0.79);
 		}
 		.sidebar-nav {
 			padding:9px 0;
+		}
+		.hero-unit, .sidebar-nav {
+			/*background-color:#DBE7E3;*/
+		}
+		.hero-unit, .well {
+			-webkit-box-shadow: inset 0 1px 1px rgba(153, 170, 160, 0.64);
+			box-shadow: inset 0 1px 1px rgba(153, 170, 160, 0.64);
+			-moz-box-shadow: inset 0 1px 1px rgba(153, 170, 160, 0.64);
+			-ms-box-shadow: inset 0 1px 1px rgba(153, 170, 160, 0.64);
+		}
+		.bg-text {
+			color:rgba(74, 167, 167, 0.79);
 		}
 	</style>
 
@@ -25,13 +38,13 @@
 				<div class="nav-collapse collapse">
 					<ul class="nav">
 						<li class="active">
-							<a href="#/">Home</a>
+							<a href="#/">home</a>
 						</li>
 						<li>
-							<a href="#/games">Games</a>
+							<a href="#/games">games</a>
 						</li>
 						<li>
-							<a href="#/about">About</a>
+							<a href="#/about">resume</a>
 						</li>
 						<li>
 							<a target="_blank" href="https://github.com/erikdonohoo">github</a>
@@ -47,13 +60,13 @@
 				<div class="well sidebar-nav">
 					<ul class="nav-list nav">
 						<li class="nav-header">Game Quick Links</li>
-						<li><a href="http://snake.erikdonohoo.com">snake</a></li>
-						<li><a href="http://mario.erikdonohoo.com">mario</a></li>
-						<li><a href="http://invaderz.erikdonohoo.com">invaderz</a></li>
+						<li class="active"><a class="bg-text" href="http://snake.erikdonohoo.com">snake</a></li>
+						<li><a class="bg-text" href="http://mario.erikdonohoo.com">mario</a></li>
+						<li><a class="bg-text" href="http://invaderz.erikdonohoo.com">invaderz</a></li>
 						<li class="nav-header">erikdonohoo.com Account</li>
-						<li><a href="#/register">Register</a></li>
-						<li><a href="#/signin">Sign in</a></li>
-						<li><a href="#/about/account">Whats this?</a></li>
+						<li><a class="bg-text" href="#/register">tegister</a></li>
+						<li><a class="bg-text" href="#/signin">sign in</a></li>
+						<li><a class="bg-text" href="#/about/account">whats this?</a></li>
 					</ul>
 				</div>
 			</div>
