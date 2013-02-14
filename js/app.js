@@ -33,7 +33,7 @@ app.run(function($rootScope) {
 
  	// User
  	$rootScope.user = {};
- 	$rootScope.user.name = 'Erik Donohoo';
+ 	$rootScope.user.name = 'Cool User';
 });
 
 //*****************************************************************************
