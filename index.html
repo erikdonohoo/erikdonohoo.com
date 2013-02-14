@@ -80,6 +80,7 @@
 		}
 		.phone-signin {
 			margin-right:20px;
+			display:block;
 		}
 
 		/* Lastly, apply responsive CSS fixes as necessary */
@@ -93,7 +94,14 @@
 		}
 		@media (max-width: 1200px) and (min-width: 967px) {
 			.sidebar-nav {
-				width:200px;
+				width:220px;
+			}
+
+			.long-li #profile-img {
+				margin-right:40px;
+			}
+			.long-li .profile-welcome {
+				margin-left:52px;
 			}
 		}
 		@media (max-width: 979px) and (min-width: 768px) {
@@ -104,6 +112,9 @@
 		@media (max-width: 767px) {
 			.navbar {
 				padding-left:20px !important;
+			}
+			#container {
+				padding-top:150px;
 			}
 		}
 
@@ -116,6 +127,7 @@
 			<div class="navbar-inner">
 				<div class="container-fluid">
 					<a class="brand" href="#/">erikdonohoo.com</a>
+					<br class="visible-phone"><br class="visible-phone">
 					<div>
 						<ul class="nav">
 							<li ng-class="{active: pageName == 'home'}">
@@ -131,7 +143,8 @@
 								<a target="_blank" href="https://github.com/erikdonohoo">github</a>
 							</li>
 						</ul>
-						<div class="visible-phone phone-signin">
+						<br class="visible-phone"><br class="visible-phone">
+						<div class="visible-phone phone-signin pull-left">
 							<button class="btn btn-primary pull-right" ng-show="!loggedIn" ng-click="toggleLogIn(true)">Log in</button>
 							<button class="btn btn-danger pull-right" ng-show="loggedIn" ng-click="toggleLogIn(false)">Sign out</button>
 							<h5 class="pull-right" ng-show="loggedIn">Welcome, <strong class="text-info">{{user.name}}&nbsp;&nbsp;</strong></h5>
