@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 	<title>erikdonohoo</title>
 
 	<!-- Bootstrap -->
@@ -8,36 +9,22 @@
 
 	<!-- Site specific styles -->
 	<style>
+
 		html,body {
 			height:100%;
 		}
-		body {
-			background: rgba(74, 167, 167, 0.79);
+		body { 
+			background: url(img/nasty_fabric.png) center center fixed;
 		}
 		.sidebar-nav {
 			padding:9px 0;
-		}
-		.hero-unit, .well {
-			-webkit-box-shadow: inset 0 1px 1px rgba(153, 170, 160, 0.64);
-			box-shadow: inset 0 1px 1px rgba(153, 170, 160, 0.64);
-			-moz-box-shadow: inset 0 1px 1px rgba(153, 170, 160, 0.64);
-			-ms-box-shadow: inset 0 1px 1px rgba(153, 170, 160, 0.64);
-		}
-		.bg-text {
-			color:rgba(74, 167, 167, 0.79);
 		}
 		#footer {
 			background:#f5f5f5;
 			height:60px;
 		}
-		#push {
-			height:60px;
-		}
-		#wrap {
-			min-height: 100%;
-			height: auto !important;
-			height: 100%;
-			margin: 0 auto -60px;
+		.well {
+			width:288px;
 		}
 		@media (max-width: 767px) {
 	        #footer {
@@ -53,57 +40,85 @@
 	    .credit {
 	    	margin:20px 0;
 	    }
+	    hr {
+	    	border-bottom:1px solid rgb(185, 185, 185);
+	    }
+	    #profile-img {
+	    	margin-right:20px;
+	    }
+	    .profile-welcome {
+	    	margin-left:20px;
+	    }
+
 	</style>
 
 </head>
 <body>
-	<div id="wrap">
-		<div class="navbar navbar-fixed-top">
-			<div class="navbar-inner">
-				<div class="container-fluid">
-					<a class="brand" href="#/">erikdonohoo.com</a>
-					<div class="nav-collapse collapse">
-						<ul class="nav">
-							<li class="active">
-								<a href="#/">home</a>
-							</li>
-							<li>
-								<a href="#/games">games</a>
-							</li>
-							<li>
-								<a href="#/about">resume</a>
-							</li>
-							<li>
-								<a target="_blank" href="https://github.com/erikdonohoo">github</a>
-							</li>
-						</ul>
-					</div>
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container-fluid">
+				<a class="brand" href="#/">erikdonohoo.com</a>
+				<div class="nav-collapse collapse">
+					<ul class="nav">
+						<li class="active">
+							<a href="#/">home</a>
+						</li>
+						<li>
+							<a href="#/games">games</a>
+						</li>
+						<li>
+							<a href="#/about">resume</a>
+						</li>
+						<li>
+							<a target="_blank" href="https://github.com/erikdonohoo">github</a>
+						</li>
+					</ul>
 				</div>
 			</div>
 		</div>
-		<div id="container" class="container-fluid">
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="well sidebar-nav">
-						<ul class="nav-list nav">
-							<li class="nav-header">Game Quick Links</li>
-							<li><a class="bg-text" href="http://snake.erikdonohoo.com">snake</a></li>
-							<li><a class="bg-text" href="http://mario.erikdonohoo.com">mario</a></li>
-							<li><a class="bg-text" href="http://invaderz.erikdonohoo.com">invaderz</a></li>
-							<li class="nav-header">erikdonohoo.com Account</li>
-							<li><a class="bg-text" href="#/register">tegister</a></li>
-							<li><a class="bg-text" href="#/signin">sign in</a></li>
-							<li><a class="bg-text" href="#/about/account">whats this?</a></li>
-						</ul>
+	</div>
+	<div id="container" class="container-fluid">
+		<div class="row-fluid">
+			<div class="span3">
+				<div class="well sidebar-nav affix">
+					<ul class="nav-list nav">
+						<li class="nav-header">Game Quick Links</li>
+						<li><a class="bg-text" href="http://snake.erikdonohoo.com">snake</a></li>
+						<li><a class="bg-text" href="http://mario.erikdonohoo.com">mario</a></li>
+						<li><a class="bg-text" href="http://invaderz.erikdonohoo.com">invaderz</a></li>
+						<li class="nav-header">erikdonohoo.com Account</li>
+						<li><a class="bg-text" href="#/register">register</a></li>
+						<li><a class="bg-text" href="#/signin">sign in</a></li>
+						<li><a class="bg-text" href="#/about/account">whats this?</a></li>
+						<li class="divider"></li>
+					</ul>
+					<img class="img-polaroid pull-right" id="profile-img" />
+					<div class="pull-left profile-welcome">
+						<h4>Welcome,</h4>
+						<p>Erik Donohoo</p>
+						<button class="btn btn-danger">Sign out</button>
 					</div>
 				</div>
-				<div class="span9">
-					<div class="hero-unit">
-						<h1 class="text-info">Welcome</h1>
-						<p>
-							Pardon my dust! I'm currently working on making this site awesome!  Feel free to check out some of my games while I work out the workings of this site.  You will be able to register for an erikdonohoo.com account and track your scores in the games here against others that have played!  You will also find links to my github and resume.  Check back again soon!
-						</p>
-					</div>
+			</div>
+			<div class="span9">
+				<div class="hero-unit">
+					<h1>Welcome</h1>
+					<p>
+						Pardon my dust! I'm currently working on making this site awesome!  Feel free to check out some of my games while I work out the workings of this site.  You will be able to register for an erikdonohoo.com account and track your scores in the games here against others that have played!  You will also find links to my github and resume.  Check back again soon!
+					</p>
+					<hr>
+					<h2 class="text-info">Stuff to do here</h2>
+					<p>
+						On this site you will find stuff that blows your mind!
+					</p>
+					<p>
+						Pardon my dust! I'm currently working on making this site awesome!  Feel free to check out some of my games while I work out the workings of this site.  You will be able to register for an erikdonohoo.com account and track your scores in the games here against others that have played!  You will also find links to my github and resume.  Check back again soon!
+					</p>
+					<hr>
+					<h2 class="text-info">Stuff to do here</h2>
+					<p>
+						On this site you will find stuff that blows your mind!
+					</p>
 				</div>
 			</div>
 		</div>
@@ -111,7 +126,7 @@
 	<div id="footer">
 		<div class="container">
 			<p class="muted credit">
-				&#169; Erik Donohoo
+				&#169; Erik Donohoo 2013
 			</p>
 		</div>
 	</div>
@@ -119,6 +134,16 @@
 	<!-- Scripts -->
 	<script src="bootstrap/js/jquery.min.js"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
+	<script src="js/md5.js"></script>
+	<script>
+		// Calculate gravatar URL
+		var email = 'erikdonohoo@gmail.com';
+		var hash = hex_md5(email);
+		console.log(hash);
+		console.log('6373dbdffa1e36dba330119cb5cad12d')
+		var url = 'http://www.gravatar.com/avatar/' + hash + '?s=100';
+		$('#profile-img').attr('src', url);
+	</script>
 
 </body>
 </html>
