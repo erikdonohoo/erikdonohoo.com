@@ -142,8 +142,8 @@
 						</ul>
 						<br class="visible-phone"><br class="visible-phone">
 						<div class="visible-phone phone-signin pull-left">
-							<button class="btn btn-primary pull-right" ng-show="!loggedIn" ng-click="toggleLogIn(true)">Log in</button>
-							<button class="btn btn-danger pull-right" ng-show="loggedIn" ng-click="toggleLogIn(false)">Sign out</button>
+							<a href="#/signin"><button class="btn btn-primary pull-right" ng-show="!loggedIn">Log in</button></a>
+							<button class="btn btn-danger pull-right" ng-show="loggedIn" ng-click="signout()">Sign out</button>
 							<h5 class="pull-right" ng-show="loggedIn">Welcome, <strong class="text-info">{{user.attributes.username}}&nbsp;&nbsp;</strong></h5>
 						</div>
 					</div>
