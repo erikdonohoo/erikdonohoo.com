@@ -111,6 +111,7 @@ function RegisterCtrl($scope, $routeParams, $location) {
 	// Set up tooltip
 	$('#gravatar-tip').tooltip();
 	$('#email-info-tip').tooltip();
+	$('#whatsthis').tooltip();
 	$scope.alert = false;
 	$scope.error = false;
 
