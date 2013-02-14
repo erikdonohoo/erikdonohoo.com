@@ -78,6 +78,9 @@
 			background-color: #f5f5f5;
 			/*margin-top:60px;*/
 		}
+		.phone-signin {
+			margin-right:20px;
+		}
 
 		/* Lastly, apply responsive CSS fixes as necessary */
 		@media (max-width: 767px) {
@@ -98,6 +101,11 @@
 				width: 166px;
 			}
 		}
+		@media (max-width: 767px) {
+			.navbar {
+				padding-left:20px !important;
+			}
+		}
 
 	</style>
 
@@ -108,7 +116,7 @@
 			<div class="navbar-inner">
 				<div class="container-fluid">
 					<a class="brand" href="#/">erikdonohoo.com</a>
-					<div class="nav-collapse collapse">
+					<div>
 						<ul class="nav">
 							<li ng-class="{active: pageName == 'home'}">
 								<a href="#/">home</a>
@@ -123,6 +131,11 @@
 								<a target="_blank" href="https://github.com/erikdonohoo">github</a>
 							</li>
 						</ul>
+						<div class="visible-phone phone-signin">
+							<button class="btn btn-primary pull-right" ng-show="!loggedIn" ng-click="toggleLogIn(true)">Log in</button>
+							<button class="btn btn-danger pull-right" ng-show="loggedIn" ng-click="toggleLogIn(false)">Sign out</button>
+							<h5 class="pull-right" ng-show="loggedIn">Welcome, <strong class="text-info">{{user.name}}&nbsp;&nbsp;</strong></h5>
+						</div>
 					</div>
 				</div>
 			</div>
