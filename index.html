@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="app">
 <head>
 
 	<title>erikdonohoo</title>
@@ -60,13 +60,13 @@
 				<a class="brand" href="#/">erikdonohoo.com</a>
 				<div class="nav-collapse collapse">
 					<ul class="nav">
-						<li class="active">
+						<li ng-class="{active: pageName == 'home'}">
 							<a href="#/">home</a>
 						</li>
-						<li>
+						<li ng-class="{active: pageName == 'games'}">
 							<a href="#/games">games</a>
 						</li>
-						<li>
+						<li ng-class="{active: pageName == 'about'}">
 							<a href="#/about">resume</a>
 						</li>
 						<li>
@@ -95,30 +95,13 @@
 					<img class="img-polaroid pull-right" id="profile-img" />
 					<div class="pull-left profile-welcome">
 						<h4>Welcome,</h4>
-						<p>Erik Donohoo</p>
+						<p class="text-info">Erik Donohoo</p>
 						<button class="btn btn-danger">Sign out</button>
 					</div>
 				</div>
 			</div>
 			<div class="span9">
-				<div class="hero-unit">
-					<h1>Welcome</h1>
-					<p>
-						Pardon my dust! I'm currently working on making this site awesome!  Feel free to check out some of my games while I work out the workings of this site.  You will be able to register for an erikdonohoo.com account and track your scores in the games here against others that have played!  You will also find links to my github and resume.  Check back again soon!
-					</p>
-					<hr>
-					<h2 class="text-info">Stuff to do here</h2>
-					<p>
-						On this site you will find stuff that blows your mind!
-					</p>
-					<p>
-						Pardon my dust! I'm currently working on making this site awesome!  Feel free to check out some of my games while I work out the workings of this site.  You will be able to register for an erikdonohoo.com account and track your scores in the games here against others that have played!  You will also find links to my github and resume.  Check back again soon!
-					</p>
-					<hr>
-					<h2 class="text-info">Stuff to do here</h2>
-					<p>
-						On this site you will find stuff that blows your mind!
-					</p>
+				<div class="hero-unit" ng-view>
 				</div>
 			</div>
 		</div>
@@ -134,13 +117,13 @@
 	<!-- Scripts -->
 	<script src="bootstrap/js/jquery.min.js"></script>
 	<script src="bootstrap/js/bootstrap.min.js"></script>
+	<script src="js/angular.min.js"></script>
+	<script src="js/app.js"></script>
 	<script src="js/md5.js"></script>
 	<script>
 		// Calculate gravatar URL
 		var email = 'erikdonohoo@gmail.com';
 		var hash = hex_md5(email);
-		console.log(hash);
-		console.log('6373dbdffa1e36dba330119cb5cad12d')
 		var url = 'http://www.gravatar.com/avatar/' + hash + '?s=100';
 		$('#profile-img').attr('src', url);
 	</script>
