@@ -162,7 +162,7 @@
 							<li class="nav-header">erikdonohoo.com Account</li>
 							<li ng-class="{active: pageName == 'register'}"><a class="bg-text" href="#/register">register</a></li>
 							<li ng-class="{active: pageName == 'signin'}"><a href="#/signin" class="bg-text">sign in</a></li>
-							<li><a class="bg-text" href="#/about/account">whats this?</a></li>
+							<li ng-class="{active: pageName == 'about_account'}"><a class="bg-text" href="#/about/account">whats this?</a></li>
 							<li class="divider"></li>
 							<li ng-show="loggedIn" class="long-li">
 								<img class="img-polaroid pull-right" id="profile-img" ng-src="{{photourl}}" />
@@ -185,7 +185,7 @@
 	<div id="footer">
 		<div class="container">
 			<p class="muted credit">
-				&#169; Erik Donohoo 2013
+				&#169; 2013 Erik Donohoo
 			</p>
 		</div>
 	</div>

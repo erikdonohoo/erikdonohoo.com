@@ -8,6 +8,7 @@ app.config(['$routeProvider', function($routeProvider,$locationProvider) {
   	  when('/', {templateUrl: 'html/home.html', controller: HomeCtrl}).
   	  when('/games', {templateUrl: 'html/games.html', controller: GamesCtrl}).
   	  when('/about', {templateUrl: 'html/about.html', controller: AboutCtrl}).
+  	  when('/about/:id', {templateUrl: 'html/about.html', controller: AboutCtrl}).
   	  when('/register', {templateUrl: 'html/register.html', controller: RegisterCtrl}).
   	  when('/signin', {templateUrl: 'html/signin.html', controller: SigninCtrl}).
       otherwise({redirectTo: '/'});
@@ -35,7 +36,7 @@ app.run(function($rootScope) {
 
  	// User
  	$rootScope.user = {};
- 	$rootScope.photourl = 'http://placehold.it/100X100';
+ 	$rootScope.photourl = 'img/default_user_icon.jpg';
 
  	$rootScope.setUser = function(user) {
  		$rootScope.user = user;
@@ -91,7 +92,13 @@ function GamesCtrl($scope, $routeParams, $location) {
 //*****************************************************************************
 function AboutCtrl($scope, $routeParams, $location) {
 
-	$scope.setPageName('about');
+	$scope.accounthelp = false;
+	if ($routeParams.id) {
+		$scope.accounthelp = true;
+		$scope.setPageName('about_account');
+	}
+	else
+		$scope.setPageName('about');
 }
 
 //*****************************************************************************
