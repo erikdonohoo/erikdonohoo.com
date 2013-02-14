@@ -30,6 +30,10 @@ app.run(function($rootScope) {
  	$rootScope.toggleLogIn = function(bool) {
  		$rootScope.loggedIn = bool;
  	}
+
+ 	// User
+ 	$rootScope.user = {};
+ 	$rootScope.user.name = 'Erik Donohoo';
 });
 
 //*****************************************************************************
