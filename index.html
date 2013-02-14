@@ -6,6 +6,8 @@
 
 	<!-- Bootstrap -->
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link href="bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
 
 	<!-- Site specific styles -->
 	<style>
@@ -86,6 +88,16 @@
 				padding-right: 20px;
 			}
 		}
+		@media (max-width: 1200px) and (min-width: 967px) {
+			.sidebar-nav {
+				width:200px;
+			}
+		}
+		@media (max-width: 979px) and (min-width: 768px) {
+			.sidebar-nav {
+				width: 166px;
+			}
+		}
 
 	</style>
 
@@ -111,18 +123,14 @@
 								<a target="_blank" href="https://github.com/erikdonohoo">github</a>
 							</li>
 						</ul>
-
-						<button class="btn btn-primary pull-right" ng-show="!loggedIn" ng-click="toggleLogIn(true)">Log in</button>
-						<button class="btn btn-danger pull-right" ng-show="loggedIn" ng-click="toggleLogIn(false)">Sign out</button>
-						<h5 class="pull-right" ng-show="loggedIn">Welcome, <strong class="text-info">{{user.name}}&nbsp;&nbsp;</strong></h5>
 					</div>
 				</div>
 			</div>
 		</div>
 		<div id="container" class="container-fluid">
 			<div class="row-fluid">
-				<div class="span3">
-					<div class="well sidebar-nav">
+				<div class="span3 hidden-phone">
+					<div class="well sidebar-nav affix">
 						<ul class="nav-list nav">
 							<li class="nav-header">Game Quick Links</li>
 							<li><a class="bg-text" href="http://snake.erikdonohoo.com">snake</a></li>
