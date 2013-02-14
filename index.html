@@ -6,17 +6,16 @@
 	<!-- Bootstrap -->
 	<link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" />
 
+	<!-- Site specific styles -->
 	<style>
+		html,body {
+			height:100%;
+		}
 		body {
-			padding-top:60px;
-			padding-bottom:40px;
 			background: rgba(74, 167, 167, 0.79);
 		}
 		.sidebar-nav {
 			padding:9px 0;
-		}
-		.hero-unit, .sidebar-nav {
-			/*background-color:#DBE7E3;*/
 		}
 		.hero-unit, .well {
 			-webkit-box-shadow: inset 0 1px 1px rgba(153, 170, 160, 0.64);
@@ -27,57 +26,93 @@
 		.bg-text {
 			color:rgba(74, 167, 167, 0.79);
 		}
+		#footer {
+			background:#f5f5f5;
+			height:60px;
+		}
+		#push {
+			height:60px;
+		}
+		#wrap {
+			min-height: 100%;
+			height: auto !important;
+			height: 100%;
+			margin: 0 auto -60px;
+		}
+		@media (max-width: 767px) {
+	        #footer {
+	          margin-left: -20px;
+	          margin-right: -20px;
+	          padding-left: 20px;
+	          padding-right: 20px;
+	        }
+	    }
+	    #container {
+	    	padding-top:60px;
+	    }
+	    .credit {
+	    	margin:20px 0;
+	    }
 	</style>
 
 </head>
 <body>
-	<div class="navbar navbar-fixed-top">
-		<div class="navbar-inner">
-			<div class="container-fluid">
-				<a class="brand" href="#/">erikdonohoo.com</a>
-				<div class="nav-collapse collapse">
-					<ul class="nav">
-						<li class="active">
-							<a href="#/">home</a>
-						</li>
-						<li>
-							<a href="#/games">games</a>
-						</li>
-						<li>
-							<a href="#/about">resume</a>
-						</li>
-						<li>
-							<a target="_blank" href="https://github.com/erikdonohoo">github</a>
-						</li>
-					</ul>
+	<div id="wrap">
+		<div class="navbar navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container-fluid">
+					<a class="brand" href="#/">erikdonohoo.com</a>
+					<div class="nav-collapse collapse">
+						<ul class="nav">
+							<li class="active">
+								<a href="#/">home</a>
+							</li>
+							<li>
+								<a href="#/games">games</a>
+							</li>
+							<li>
+								<a href="#/about">resume</a>
+							</li>
+							<li>
+								<a target="_blank" href="https://github.com/erikdonohoo">github</a>
+							</li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="container" class="container-fluid">
+			<div class="row-fluid">
+				<div class="span3">
+					<div class="well sidebar-nav">
+						<ul class="nav-list nav">
+							<li class="nav-header">Game Quick Links</li>
+							<li><a class="bg-text" href="http://snake.erikdonohoo.com">snake</a></li>
+							<li><a class="bg-text" href="http://mario.erikdonohoo.com">mario</a></li>
+							<li><a class="bg-text" href="http://invaderz.erikdonohoo.com">invaderz</a></li>
+							<li class="nav-header">erikdonohoo.com Account</li>
+							<li><a class="bg-text" href="#/register">tegister</a></li>
+							<li><a class="bg-text" href="#/signin">sign in</a></li>
+							<li><a class="bg-text" href="#/about/account">whats this?</a></li>
+						</ul>
+					</div>
+				</div>
+				<div class="span9">
+					<div class="hero-unit">
+						<h1 class="text-info">Welcome</h1>
+						<p>
+							Pardon my dust! I'm currently working on making this site awesome!  Feel free to check out some of my games while I work out the workings of this site.  You will be able to register for an erikdonohoo.com account and track your scores in the games here against others that have played!  You will also find links to my github and resume.  Check back again soon!
+						</p>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
-	<div class="container-fluid">
-		<div class="row-fluid">
-			<div class="span3">
-				<div class="well sidebar-nav">
-					<ul class="nav-list nav">
-						<li class="nav-header">Game Quick Links</li>
-						<li class="active"><a class="bg-text" href="http://snake.erikdonohoo.com">snake</a></li>
-						<li><a class="bg-text" href="http://mario.erikdonohoo.com">mario</a></li>
-						<li><a class="bg-text" href="http://invaderz.erikdonohoo.com">invaderz</a></li>
-						<li class="nav-header">erikdonohoo.com Account</li>
-						<li><a class="bg-text" href="#/register">tegister</a></li>
-						<li><a class="bg-text" href="#/signin">sign in</a></li>
-						<li><a class="bg-text" href="#/about/account">whats this?</a></li>
-					</ul>
-				</div>
-			</div>
-			<div class="span9">
-				<div class="hero-unit">
-					<h1 class="text-info">Welcome</h1>
-					<p>
-						Pardon my dust! I'm currently working on making this site awesome!  Feel free to check out some of my games while I work out the workings of this site.  You will be able to register for an erikdonohoo.com account and track your scores in the games here against others that have played!  You will also find links to my github and resume.  Check back again soon!
-					</p>
-				</div>
-			</div>
+	<div id="footer">
+		<div class="container">
+			<p class="muted credit">
+				&#169; Erik Donohoo
+			</p>
 		</div>
 	</div>
 
