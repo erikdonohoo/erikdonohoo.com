@@ -1,6 +1,6 @@
 <h2>Sign in</h2>
 <hr>
-<form class="form-horizontal" ng-submit="signin()">
+<form class="form-horizontal" ng-submit="signin()" ng-show="!showreset">
 	<div class="control-group">
 		<label class="control-label" for="inputUsername">Username </label>
 		<div class="controls">
@@ -21,12 +21,44 @@
 	</div>
 	<div class="control-group">
 		<div class="controls">
-			<div class="alert alert-danger" ng-show="error">
-				<button type="button" class="close" ng-click="error = false">&times;</button>
-				<strong>Error!</strong> Not a valid login
-			</div>
 			<button type="submit" class="btn btn-primary dontblock">Submit</button>
 			<img src="img/loading.gif" ng-show="loading" />
+		</div>
+	</div>
+</form>
+<form class="form-horizontal">
+	<div class="control-group">
+		<div class="controls">
+			<button ng-show="!showreset" class="btn btn-warning" ng-click="showreset = !showreset">Forgot Password</button>
+		</div>
+	</div>
+</form>
+<form class="form-horizontal" ng-submit="resetPassword()">
+	<div class="control-group">
+		<div class="controls">
+			<div ng-show="showreset" class="input-prepend input-append">
+				<span class="add-on"><i class="icon-envelope"></i></span>
+				<input type="text" id="inputPasswordReset" placeholder="Account email" ng-model="passwordresetemail">
+				<span class="add-on" style="cursor:pointer;"><i class="icon-remove" ng-click="showreset = !showreset"></i></span>
+			</div>
+		</div>
+	</div>
+	<div class="control-group">
+		<div class="controls" ng-show="showreset">
+			<button type="submit" class="btn btn-primary dontblock">Reset</button>
+			<img src="img/loading.gif" ng-show="loading" />
+		</div>
+	</div>
+	<div class="control-group">
+		<div class="controls">
+			<div class="alert alert-danger" ng-show="error">
+				<button type="button" class="close" ng-click="error = false">&times;</button>
+				<strong>Error!</strong> {{errormessage}}
+			</div>
+			<div class="alert alert-info" ng-show="passwordreset">
+				<button type="button" class="close" ng-click="passwordreset = false">&times;</button>
+				<strong>Email Sent</strong> Password reset email was sent to address listed above
+			</div>
 		</div>
 	</div>
 </form>

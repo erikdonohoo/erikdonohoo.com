@@ -234,7 +234,6 @@ function RegisterCtrl($scope, $routeParams, $location) {
 			},
 			error: function(error) {
 				// Show the error message somewhere
-				$scope.
 				$scope.loading = false;
 				$scope.passwordreseterror = true;
 				$scope.$digest();
@@ -270,8 +269,30 @@ function SigninCtrl($scope, $routeParams, $location) {
 		    // The login failed. Check error to see why.
 		    $scope.error = true;
 		    $scope.loading = false;
+		    $scope.errormessage = error.message;
 		    $scope.$digest();
 		  }
+		});
+	}
+
+	$scope.resetPassword = function() {
+
+		// start loading spinner
+		$scope.loading = true;
+		Parse.User.requestPasswordReset($scope.passwordresetemail, {
+			success: function() {
+				// Password reset request was sent successfully
+				$scope.passwordreset = true;
+				$scope.loading = false;
+				$scope.$digest();
+			},
+			error: function(error) {
+				// Show the error message somewhere
+				$scope.loading = false;
+				$scope.error = true;
+				$scope.errormessage = error.message;
+				$scope.$digest();
+			}
 		});
 	}
 }
