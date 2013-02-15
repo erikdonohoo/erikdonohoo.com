@@ -34,7 +34,11 @@
 	</div>
 </form>
 <form class="form-horizontal" ng-submit="resetPassword()">
-	<div class="control-group">
+	<div class="control-group" ng-show="showreset">
+		<div class="controls">
+			<p>Enter your account email and click <strong class="text-info">reset</strong> to have an email sent to you to reset your password.  If you forgot your username, it will be shown to you when you open the link in your email</p>
+			<p>Click  &nbsp;<i class="icon-remove"></i>&nbsp;  to go back to the sign in screen</p>
+		</div>
 		<div class="controls">
 			<div ng-show="showreset" class="input-prepend input-append">
 				<span class="add-on"><i class="icon-envelope"></i></span>
