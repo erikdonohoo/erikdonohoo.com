@@ -110,6 +110,11 @@
 		}
 
 		/* Lastly, apply responsive CSS fixes as necessary */
+		@media (min-width: 1700px) {
+			.sidebar-nav {
+				width:400px;
+			}
+		}
 		@media (max-width: 1200px) and (min-width: 967px) {
 			.sidebar-nav {
 				width:220px;
@@ -191,7 +196,7 @@
 		<div id="container" class="container-fluid">
 			<div class="row-fluid">
 				<div class="span3 hidden-phone">
-					<div class="well sidebar-nav affix">
+					<div class="well sidebar-nav" data-spy="affix" data-offset-top="0">
 						<ul class="nav-list nav">
 							<li class="nav-header">Game Quick Links</li>
 							<li><a class="bg-text" href="http://snake.erikdonohoo.com">snake</a></li>

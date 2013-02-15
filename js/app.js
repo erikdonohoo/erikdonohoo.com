@@ -206,11 +206,11 @@ function RegisterCtrl($scope, $routeParams, $location) {
 			$scope.loading = true;
 			$scope.alert = false;
 			var puser = $scope.getUser();
-			console.log($scope.newuser.email);
-			console.log(puser.get('username'));
+			var oldemail = puser.get('email');
+			var oldgrav = puser.get('gravatar');
 			puser.set('email', $scope.newuser.email);
 			puser.set('gravatar', $scope.newuser.gravatar);
-			var samename = puser.get('username');
+			var savename = puser.get('username');
 
 			// save parse user
 			puser.save(null, {
@@ -220,15 +220,20 @@ function RegisterCtrl($scope, $routeParams, $location) {
 					var u = $scope.getUser();
 					u.set('email', user.get('email'));
 					u.set('gravatar', user.get('gravatar'));
-					u.set('username', samename);
+					u.set('username', savename);
 					$scope.setUser(u);
-					console.log(u);
 					$scope.info = true;
 					$scope.infomessage = 'Account was successfully updated';
 					$scope.$digest();
 				},
 				error: function(user, error) {
 
+					var u = $scope.getUser();
+					u.set('email', oldemail);
+					u.set('gravatar', oldgrav);
+					u.set('username', savename);
+					$scope.newuser.email = oldemail;
+					$scope.newuser.gravatar = oldgrav;
 					$scope.loading = false;
 					$scope.updateerror = true;
 					$scope.updatemessage = error.message;
