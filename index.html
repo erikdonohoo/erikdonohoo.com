@@ -92,6 +92,10 @@
 			margin-right:20px;
 			display:block;
 		}
+		#profile-img {
+			padding:0;
+			margin-right:0px;
+		}
 
 		/* Lastly, apply responsive CSS fixes as necessary */
 		@media (max-width: 1200px) and (min-width: 967px) {
@@ -177,7 +181,7 @@
 							<li ng-class="{active: pageName == 'about_account'}"><a class="bg-text" href="#/about/account">what's this?</a></li>
 							<li class="divider"></li>
 							<li ng-show="loggedIn" class="long-li">
-								<img class="img-polaroid pull-right" id="profile-img" ng-src="{{photourl}}" />
+								<a href="{{profile}}" class="pull-right" id="profile-img" target="_blank"><img class="img-polaroid" ng-src="{{photourl}}" /></a>
 								<div class="pull-left profile-welcome">
 									<h4>Welcome,</h4>
 									<p class="text-info">{{user.attributes.username}}</p>

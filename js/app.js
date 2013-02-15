@@ -41,6 +41,7 @@ app.run(function($rootScope) {
  	// User
  	$rootScope.user = {};
  	$rootScope.photourl = 'img/default_user_icon.jpg';
+ 	$rootScope.profile = '';
 
  	$rootScope.setUser = function(user) {
  		$rootScope.user = user;
@@ -48,6 +49,7 @@ app.run(function($rootScope) {
  			// Set image for gravatar
  			var hash = hex_md5($rootScope.user.get('email'));
 			$rootScope.photourl = 'http://www.gravatar.com/avatar/' + hash + '?s=100';
+			$rootScope.profile = 'http://www.gravatar.com/' + hash;
  		} else {
  			$rootScope.photourl = 'img/default_user_icon.jpg';
  		}
