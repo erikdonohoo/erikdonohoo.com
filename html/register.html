@@ -40,13 +40,13 @@
 	</div>
 	<div class="control-group" ng-show="loggedIn">
 		<div class="controls">
-			<button ng-click="resetPassword()" class="btn">Reset Password</button>
-			<img src="img/loading.gif" ng-show="loading" />
+			<button ng-click="resetPassword($event)" class="btn">Reset Password</button>
+			<img src="img/loading.gif" ng-show="updateloading" />
 		</div>
 		<div class="controls">
-			<div class="alert alert-info" ng-show="passwordreset">
-				<button type="button" class="close" ng-click="passwordreset = false">&times;</button>
-				<strong>Email Sent</strong> Password reset email was sent to address listed above
+			<div class="alert alert-info" ng-show="info">
+				<button type="button" class="close" ng-click="info = false">&times;</button>
+				<strong>Info</strong> {{infomessage}}
 			</div>
 			<div class="alert alert-danger" ng-show="passwordreseterror">
 				<button type="button" class="close" ng-click="passwordreseterror = false">&times;</button>

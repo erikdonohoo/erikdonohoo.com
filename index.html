@@ -207,7 +207,7 @@
 								<a href="{{profile}}" title="click for gravatar profile" class="pull-right" id="profile-img" target="_blank"><img class="img-polaroid" ng-src="{{photourl}}" /></a>
 								<div class="pull-left profile-welcome">
 									<h4>Welcome,</h4>
-									<p class="text-info">{{user.attributes.username}}</p>
+									<p class="text-info">{{user.get('username');}}</p>
 									<button class="btn btn-danger" ng-click="signout();">Sign out</button>
 								</div>
 							</li>
