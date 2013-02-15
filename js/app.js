@@ -45,11 +45,13 @@ app.run(function($rootScope) {
 
  	$rootScope.setUser = function(user) {
  		$rootScope.user = user;
+ 		$('#profile-img').tooltip('destroy');
  		if ($rootScope.user.get('gravatar')) {
  			// Set image for gravatar
  			var hash = hex_md5($rootScope.user.get('email'));
 			$rootScope.photourl = 'http://www.gravatar.com/avatar/' + hash + '?s=100';
 			$rootScope.profile = 'http://www.gravatar.com/' + hash;
+			$('#profile-img').tooltip({'placement': 'right'});
  		} else {
  			$rootScope.photourl = 'img/default_user_icon.jpg';
  		}
