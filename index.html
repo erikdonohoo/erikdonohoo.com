@@ -143,8 +143,11 @@
 			.navbar {
 				padding-left:20px !important;
 			}
+			.navbar .brand {
+				display:none;
+			}
 			#container {
-				padding-top:150px;
+				padding-top:70px;
 			}
 			#footer {
 				margin-left: -20px;
@@ -166,7 +169,6 @@
 			<div class="navbar-inner">
 				<div class="container-fluid">
 					<a class="brand" href="#/">erikdonohoo.com</a>
-					<br class="visible-phone"><br class="visible-phone">
 					<div>
 						<ul class="nav">
 							<li ng-class="{active: pageName == 'home'}">
@@ -182,12 +184,6 @@
 								<a target="_blank" href="https://github.com/erikdonohoo">github</a>
 							</li>
 						</ul>
-						<br class="visible-phone"><br class="visible-phone">
-						<div class="visible-phone phone-signin pull-left">
-							<a href="#/signin"><button class="btn btn-primary pull-right" ng-show="!loggedIn">Log in</button></a>
-							<button class="btn btn-danger pull-right" ng-show="loggedIn" ng-click="signout()">Sign out</button>
-							<h5 class="pull-right" ng-show="loggedIn">Welcome, <strong class="text-info">{{user.attributes.username}}&nbsp;&nbsp;</strong></h5>
-						</div>
 					</div>
 				</div>
 			</div>
