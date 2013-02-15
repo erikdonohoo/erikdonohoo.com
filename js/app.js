@@ -105,6 +105,7 @@ function AboutCtrl($scope, $routeParams, $location) {
 	$scope.accounthelp = false;
 	if ($routeParams.id) {
 		$scope.accounthelp = true;
+		$scope.setPageName('about_account');
 	}
 	else
 		$scope.setPageName('about');
