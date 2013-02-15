@@ -1,7 +1,7 @@
 <div ng-show="!accounthelp">
 	<h1>Who is Erik Donohoo?</h1>
 	<p>
-		That's pronounced <strong class="text-info">"Dawn-a-who"</strong>
+		That's pronounced <strong class="text-info">"dawn-uh-who"</strong>
 	</p>
 	<hr>
 	<section>
@@ -22,9 +22,9 @@
 			I'd be happy to talk about any opportunities.  If I have time for it, I'd love to work on any project, big or small.  Get a hold of me, or grab a copy of my resume for more info.
 		</p>
 		<div class="btn-group">
-		  	<a href="mailto:erikdonohoo@gmail.com?subject=erikdonohoo.com Inquiry" class="btn"><i class="icon-envelope"></i> Email</a>
-		  	<a href="files/Resume.pdf" target="_blank" class="btn"><i class="icon-file"></i> Resume (PDF)</a>
-		  	<a href="http://github.com/erikdonohoo" target="_blank" class="btn"><i class="icon-book"></i> github</a>
+		  	<a href="mailto:erikdonohoo@gmail.com?subject=erikdonohoo.com Inquiry" class="btn btn-success"><i class="icon-envelope"></i> Email</a>
+		  	<a href="files/Resume.pdf" target="_blank" class="btn btn-info"><i class="icon-file"></i> Resume (PDF)</a>
+		  	<a href="http://github.com/erikdonohoo" target="_blank" class="btn btn-warning"><i class="icon-book"></i> github</a>
 		</div>
 	</section>
 </div>
@@ -34,10 +34,12 @@
 	<p>
 		With your erikdonohoo.com account you can track your scores on any of the games here that I have made.  You don't need an account to play, but isn't it more fun to see how bad you are destroying the competition?  With an account, you can compete against others, view scoreboards, and try to work your way up the ranks.  It's totally free and you only need to create a username and password.  If you would like a custom avatar, <strong>make sure you check 'use gravatar' when you register.</strong>  You can always go back and update it later.  If you do choose to use <a href="http://gravatar.com" target="_blank">gravatar</a>, you will need to add the email address you use on gravatar.com to see that image show up here.
 	</p>
-	<p>
-		Ready to get in on the action?
-	</p>
-	<p>
-		<a href="#/register" class="btn btn-success">Register</a> or <a href="#/signin" class="btn-primary btn">Sign in</a> now!
-	</p>
+	<div ng-show="!loggedIn">
+		<p>
+			Ready to get in on the action?
+		</p>
+		<p>
+			<a href="#/register" class="btn btn-success">Register</a> or <a href="#/signin" class="btn-primary btn">Sign in</a> now!
+		</p>
+	</div>
 </div>
