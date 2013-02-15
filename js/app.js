@@ -134,6 +134,11 @@ function RegisterCtrl($scope, $routeParams, $location) {
 		$scope.newuser.email = u.get('email');
 	}
 	else {
+
+		// Don't come to account when you aren't signed in
+		if($location.path() == '/account')
+			$location.path('/');
+
 		$scope.setPageName('register');
 		$scope.logoMessage = 'Create an';
 		$scope.buttonMessage = 'Create';
@@ -256,6 +261,7 @@ function SigninCtrl($scope, $routeParams, $location) {
 	$scope.setPageName('signin');
 	$scope.error = false;
 	$scope.loading = false;
+	$scope.mainmessage = 'Sign in';
 
 	$scope.signin = function() {
 

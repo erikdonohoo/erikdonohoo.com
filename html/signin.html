@@ -1,4 +1,4 @@
-<h2>Sign in</h2>
+<h2>{{mainmessage}}</h2>
 <hr>
 <form class="form-horizontal" ng-submit="signin()" ng-show="!showreset">
 	<div class="control-group">
@@ -29,7 +29,7 @@
 <form class="form-horizontal">
 	<div class="control-group">
 		<div class="controls">
-			<button ng-show="!showreset" class="btn btn-warning" ng-click="showreset = !showreset">Forgot Password</button>
+			<button ng-show="!showreset" class="btn btn-warning" ng-click="showreset = true; mainmessage = 'Reset password';">Forgot Password</button>
 		</div>
 	</div>
 </form>
@@ -39,11 +39,12 @@
 			<p>Enter your account email and click <strong class="text-info">reset</strong> to have an email sent to you to reset your password.  If you forgot your username, it will be shown to you when you open the link in your email</p>
 			<p>Click  &nbsp;<i class="icon-remove"></i>&nbsp;  to go back to the sign in screen</p>
 		</div>
+		<label class="control-label" for="inputPasswordReset">Account Email</label>
 		<div class="controls">
 			<div ng-show="showreset" class="input-prepend input-append">
 				<span class="add-on"><i class="icon-envelope"></i></span>
-				<input type="text" id="inputPasswordReset" placeholder="Account email" ng-model="passwordresetemail">
-				<span class="add-on" style="cursor:pointer;"><i class="icon-remove" ng-click="showreset = !showreset"></i></span>
+				<input type="text" id="inputPasswordReset" placeholder="email" ng-model="passwordresetemail">
+				<span class="add-on" style="cursor:pointer;"><i class="icon-remove" ng-click="showreset = false; mainmessage = 'Sign in';"></i></span>
 			</div>
 		</div>
 	</div>
