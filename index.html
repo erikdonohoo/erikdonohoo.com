@@ -201,9 +201,9 @@
 						<ul class="nav-list nav">
 							<li class="nav-header">Game Quick Links</li>
 							<li ng-class="{active: pageName == 'snake'}"><a class="bg-text" href="#/snake">snake</a></li>
-							<li><a class="bg-text" href="http://mario.erikdonohoo.com">mario</a></li>
-							<li><a class="bg-text" href="http://invaderz.erikdonohoo.com">invaderz</a></li>
-							<li><a class="bg-text" href="">chess</a></li>
+							<li><a class="bg-text" href=""><del>mario</del><span class="text-error">&emsp;coming soon</span></a></li>
+							<li><a class="bg-text" href=""><del>invaderz</del><span class="text-error">&emsp;coming soon</span></a></li>
+							<li><a class="bg-text" href=""><del>chess</del><span class="text-error">&emsp;coming soon</span></a></li>
 							<li class="nav-header">erikdonohoo.com Account</li>
 							<li ng-show="!loggedIn" ng-class="{active: pageName == 'register'}"><a class="bg-text" href="#/register">register</a></li>
 							<li ng-show="!loggedIn" ng-class="{active: pageName == 'signin'}"><a href="#/signin" class="bg-text">sign in</a></li>
@@ -215,7 +215,7 @@
 								<div class="pull-left profile-welcome">
 									<h4>Welcome,</h4>
 									<p class="text-info">{{user.get('username');}}</p>
-									<button class="btn btn-danger" ng-click="signout();">Sign out</button>
+									<button class="btn btn-danger" ng-click="signout(false);">Sign out</button>
 								</div>
 							</li>
 						</ul>
@@ -245,7 +245,6 @@
 	<script> Parse.initialize("u4UDoW5Y5vCcBnY53S0xXXZU7mP83WCR4k1aWw9l", "k0qH1SvS7VaALAnRwwZGWAldnKUxHI39JzlMGkm7"); </script>
 	<script src="js/app.js"></script>
 	<script src="js/md5.js"></script>
-	<script src="js/snake.js"></script>
 
 </body>
 </html>

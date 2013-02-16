@@ -15,14 +15,14 @@
 
 <h2>Snake</h2>
 <hr>
-<div ng-controller="snakeController">
+<div id="snakecontainer">
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="span7">
 				<canvas id="snakecanvas" width="384" height="384"></canvas>
 				<button ng-show="paused || !started" class="btn btn-success" ng-click="togglePlay()">Start</button>
 				<button ng-show="started && !paused" class="btn btn-warning" ng-click="togglePlay()">Pause</button>
-				<button ng-show="!paused && gameover && loggedIn" ng-click="saveScore()" class="btn btn-primary">Save that Score!</button>
+				<button ng-class="{'btn-primary': scoreToSave, 'btn-link': !scoreToSave}" id="savescorebutton" data-loading-text="Saving..." data-complete-text="Score Saved!" ng-show="!paused && gameover && loggedIn" ng-click="saveScore()" class="btn">Save that Score!</button>
 				<div class="span5 score-span pull-right text-right"><strong>SCORE: </strong><code>{{score | number:0}}</code></div>
 			</div>
 			<div class="span5">
@@ -31,10 +31,10 @@
 					To control...
 				</p>
 				<p>
-					Use <span class="label label-info">I</span> for <i class="icon-arrow-up"></i><br>
-					Use <span class="label label-info">K</span> for <i class="icon-arrow-down"></i><br>
-					Use <span class="label label-info">J</span> for <i class="icon-arrow-left"></i><br>
-					Use <span class="label label-info">L</span> for <i class="icon-arrow-right"></i>
+					Use <span class="label label-info"><i class="icon-arrow-up"></i></span>
+					<span class="label label-info"><i class="icon-arrow-down"></i></span>
+					<span class="label label-info"><i class="icon-arrow-left"></i></span>
+					<span class="label label-info"><i class="icon-arrow-right"></i></span> keys to move
 				</p>
 				<p>
 					Try to collect as much food as you can!  You can go through walls but don't run into yourself or it's gameover!
@@ -54,6 +54,7 @@
 	</div>
 	<div class="modal-footer">
 		<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancel</button>
-		<button ng-click="leave()" class="btn btn-danger">Leave Anyway</button>
+		<button ng-show="!signingOut" ng-click="leave()" class="btn btn-danger">Leave Anyway</button>
+		<button ng-show="signingOut" ng-click="signout(true)" class="btn btn-danger">Sign Out Anyway</button>
 	</div>
 </div>

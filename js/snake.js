@@ -1,7 +1,7 @@
 // Snake Controller and all code needed for game
-function snakeController($scope, $rootScope) {
+function snakeController($rootScope, $scope) {
 
-	// Angular ng-models
+		// Angular ng-models
 	$scope.started = false;
 	$scope.gameover = false;
 	$scope.paused = false;
@@ -25,10 +25,10 @@ function snakeController($scope, $rootScope) {
 	var RIGHT = new Position(1,0);	//..............// Define RIGHT
 	var UP = new Position(0,-1);	//..............// Define UP
 	var DOWN = new Position(0,1);	//..............// Define DOWN
-	var KEYBOARD_UP = 73;	//......................// Define I key
-	var KEYBOARD_DOWN = 75;	//......................// Define K key
-	var KEYBOARD_LEFT = 74;	//......................// Define J key
-	var KEYBOARD_RIGHT = 76;	//..................// Define L key
+	var KEYBOARD_UP = 38;	//......................// Define I key
+	var KEYBOARD_DOWN = 40;	//......................// Define K key
+	var KEYBOARD_LEFT = 37;	//......................// Define J key
+	var KEYBOARD_RIGHT = 39;	//..................// Define L key
 	var SNAKE_PIECE_SIZE = 10;	//..................// Size of snake Pieces (pixels)
 	var GAP_SIZE = 3;	//..........................// Gap between spaces on board
 	var SQUARE_SIZE = 16;	//......................// Size of squares in pixels
@@ -56,35 +56,17 @@ function snakeController($scope, $rootScope) {
 				clearTimeout(timer);
 			} else {
 				setTimeout(snakeMove, GAME_SPEED);
+
+				// Reset save button
+				$('#savescorebutton').button('reset');
 			}
 
 		} else {
 
 			// Kick off initial start
 			$scope.started = true;
+			$rootScope.setStillPlaying(true);
 			startGame();
-		}
-	}
-
-	// Save score
-	$scope.saveScore = function() {
-
-		// Make sure there is a score to save
-		if ($scope.scoreToSave) {
-
-			$scope.scoreToSave = false;
-			var SnakeScore = Parse.Object.extend('SnakeScore');
-			var snakescore = new SnakeScore();
-			snakescore.set('score', $scope.score);
-			snakescore.set('user', $rootScope.getUser());
-			snakescore.save(null,{
-				success: function(score) {
-					// Saved
-				},
-				error: function(score, error) {
-					// Error
-				}
-			});
 		}
 	}
 
@@ -95,24 +77,62 @@ function snakeController($scope, $rootScope) {
 		c = $('#snakecanvas')[0];
 		canvas = c.getContext('2d');
 
+		// Init a snake to avoid errors
+		snake = new Snake();
+
 		// Add event listeners
 		$(document).keydown(function(e){
 			if (e.which == KEYBOARD_RIGHT && snake.direction != LEFT) {
 				NEXT_DIRECTION = RIGHT;
+				e.preventDefault();
 			}
 			else if (e.which == KEYBOARD_LEFT && snake.direction != RIGHT) {
 				NEXT_DIRECTION = LEFT;
+				e.preventDefault();
 			}
 			else if (e.which == KEYBOARD_DOWN && snake.direction != UP) {
 				NEXT_DIRECTION = DOWN;
+				e.preventDefault();
 			}
 			else if (e.which == KEYBOARD_UP && snake.direction != DOWN) {
 				NEXT_DIRECTION = UP;
+				e.preventDefault();
 			}
 		});
 
 		// Draw initial game screen
 		// TODO
+	}
+
+	// Save score
+	$scope.saveScore = function() {
+
+		// Make sure there is a score to save
+		if ($scope.scoreToSave) {
+
+			var SnakeScore = Parse.Object.extend('SnakeScore');
+			var snakescore = new SnakeScore();
+			snakescore.set('score', $scope.score);
+			snakescore.set('user', $rootScope.getUser());
+
+			console.log('saving');
+			$('#savescorebutton').button('loading');
+			snakescore.save(null,{
+				success: function(score) {
+					// Saved
+					$('#savescorebutton').button('complete');
+					$scope.scoreToSave = false;
+					$rootScope.setStillPlaying(false);
+					$scope.$apply();
+				},
+				error: function(score, error) {
+					// Error
+					$('#savescorebutton').button('complete');
+					$scope.scoreToSave = false;
+					$scope.$apply();
+				}
+			});
+		}
 	}
 
 	////////////////////////////////////
