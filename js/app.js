@@ -12,13 +12,15 @@ app.config(['$routeProvider', function($routeProvider,$locationProvider) {
   	  when('/register', {templateUrl: 'html/register.html', controller: RegisterCtrl}).
   	  when('/signin', {templateUrl: 'html/signin.html', controller: SigninCtrl}).
   	  when('/account', {templateUrl: 'html/register.html', controller: RegisterCtrl}).
+  	  when('/snake', {templateUrl: 'html/snake.html', controller: SnakeCtrl}).
       otherwise({redirectTo: '/'});
 }]);
 
 //*****************************************************************************
 //  ROOTSCOPE SETUP
 //*****************************************************************************
-app.run(function($rootScope) {
+app.run(function($rootScope, $route) {
+
  	
  	// Page name
  	$rootScope.pageName = '';
@@ -83,12 +85,14 @@ app.run(function($rootScope) {
 		$rootScope.toggleLogIn(true);
 		window.location = '#/';
 	}
+
 });
+
 
 //*****************************************************************************
 //  HOME CTRL
 //*****************************************************************************
-function HomeCtrl($scope, $routeParams, $location) {
+function HomeCtrl($scope, $routeParams, $location, $route) {
 
 	$scope.setPageName('home');
 }
@@ -99,6 +103,31 @@ function HomeCtrl($scope, $routeParams, $location) {
 function GamesCtrl($scope, $routeParams, $location) {
 
 	$scope.setPageName('games');
+}
+
+//*****************************************************************************
+//  SNAKE CTRL
+//*****************************************************************************
+function SnakeCtrl($scope, $routeParams, $location) {
+
+	$scope.setPageName('snake');
+
+	// THIS CODE PREVENTS A PAGE CHANGE
+	$scope.readytoleave = false;
+	$scope.gotonext = '';
+	$scope.$on('$locationChangeStart', function(event, next, current){
+		if(!$scope.readytoleave) {
+		    event.preventDefault();
+		    $scope.gotonext = next.substring(next.indexOf('#') + 1);
+		    $('#pageLeave').modal('show');
+		}
+	});
+
+	$scope.leave = function() {
+		$('#pageLeave').modal('hide');
+		$scope.readytoleave = true;
+		setTimeout(function() { $location.path($scope.gotonext); $scope.$apply(); }, 500);
+	}
 }
 
 //*****************************************************************************

@@ -140,7 +140,8 @@
 		}
 		@media (max-width: 767px) {
 			body {
-				overflow-x:hidden;
+				overflow-x:auto;
+				overflow-y:scroll;
 			}
 			.span9 {
 				width:100%;
@@ -199,7 +200,7 @@
 					<div class="well sidebar-nav" data-spy="affix" data-offset-top="0">
 						<ul class="nav-list nav">
 							<li class="nav-header">Game Quick Links</li>
-							<li><a class="bg-text" href="http://snake.erikdonohoo.com">snake</a></li>
+							<li ng-class="{active: pageName == 'snake'}"><a class="bg-text" href="#/snake">snake</a></li>
 							<li><a class="bg-text" href="http://mario.erikdonohoo.com">mario</a></li>
 							<li><a class="bg-text" href="http://invaderz.erikdonohoo.com">invaderz</a></li>
 							<li><a class="bg-text" href="">chess</a></li>
@@ -244,13 +245,6 @@
 	<script> Parse.initialize("u4UDoW5Y5vCcBnY53S0xXXZU7mP83WCR4k1aWw9l", "k0qH1SvS7VaALAnRwwZGWAldnKUxHI39JzlMGkm7"); </script>
 	<script src="js/app.js"></script>
 	<script src="js/md5.js"></script>
-	<script>
-		// Calculate gravatar URL
-		var email = 'erikdonohoo@gmail.com';
-		var hash = hex_md5(email);
-		var url = 'http://www.gravatar.com/avatar/' + hash + '?s=100';
-		url = 'http://placehold.it/100X100';
-	</script>
 
 </body>
 </html>
