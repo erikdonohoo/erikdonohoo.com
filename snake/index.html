@@ -84,185 +84,21 @@
 			pullHighScore();
 			getDBHash();
 
-			// Get the canvas context
-			var c = document.getElementById('main-canvas');
-			var canvas = c.getContext('2d');
+			
 
-			// Define Position Struct
-			function Position(x,y) {
-				this.x = x;
-				this.y = y;
-			}
+			
 
 			// Constants
-			var BOARD_SIZE = 24;  // Must be even
-			var LEFT = new Position(-1,0);
-			var RIGHT = new Position(1,0);
-			var UP = new Position(0,-1);
-			var DOWN = new Position(0,1)
-			var SNAKE_PIECE_SIZE = 10;
-			var GAP_SIZE = 3;
-			var SQUARE_SIZE = 16;
-			var STARTING_CENTER = (BOARD_SIZE / 2) - 1;
-			var KEYBOARD_UP = 38;
-			var KEYBOARD_DOWN = 40;
-			var KEYBOARD_LEFT = 37;
-			var KEYBOARD_RIGHT = 39;
-			var ENTER = 13;
-			var GAME_SPEED;
-			var MAX_SPEED = 50;
-			var SPEED_CHANGE_INTERVAL = 10;
-			var CUR_FOOD;
-			var gameover = false;
-			var timer;
-			var snake; // game snake
-			var NEXT_DIRECTION; // snakes next direction
-			var SCORE = 0;
-			var canGoThroughWalls = true;
-			var SNAKE_HEAD_COLOR = '#A80D0D';
-			var SNAKE_DEFAULT_COLOR = '#1D7E25';
+			
+			
 
-			// Array to hold all objects on screen
-			var visible_pieces = new Array();
+			
 
-			// Define Food
-			function Food(x,y) {
+			
 
-				this.position = new Position(x,y);
+			
 
-				// Draw food
-				this.draw = function() {
-
-					canvas.fillStyle = '#333333';
-					canvas.strokeRect((SQUARE_SIZE * this.position.x) + GAP_SIZE, (SQUARE_SIZE * this.position.y) + GAP_SIZE, SNAKE_PIECE_SIZE, SNAKE_PIECE_SIZE);
-				}
-			}
-
-			// Define SnakePiece
-			function SnakePiece(x,y) {
-
-				this.position = new Position(x,y);
-				this.color = SNAKE_DEFAULT_COLOR;
-
-				// Draw an individual snake piece
-				this.draw = function() {
-
-					canvas.fillStyle = this.color;
-					canvas.fillRect((SQUARE_SIZE * this.position.x) + GAP_SIZE, (SQUARE_SIZE * this.position.y) + GAP_SIZE, SNAKE_PIECE_SIZE, SNAKE_PIECE_SIZE);
-				}
-			}
-
-			function resetColor(pieces) {
-
-				for (var i = 0; i < pieces.length; i++) {
-					pieces[i].color = SNAKE_DEFAULT_COLOR;
-				}
-			}
-
-			// Define the snake
-			function Snake() {
-
-				this.direction = RIGHT;
-				this.snakePieces = new Array();
-
-				// End of Array, is actually beginning of snake
-				this.snakePieces.push(new SnakePiece(STARTING_CENTER - 2,STARTING_CENTER));
-				this.snakePieces.push(new SnakePiece(STARTING_CENTER - 1,STARTING_CENTER));
-				var head = new SnakePiece(STARTING_CENTER,STARTING_CENTER);
-				head.color = SNAKE_HEAD_COLOR;
-				this.snakePieces.push(head);
-
-				// Draws the snake to the board
-				this.draw = function(){
-					
-					for (var i = 0; i < this.snakePieces.length; i++) {
-						this.snakePieces[i].draw();
-					}
-				}
-
-				this.move = function(){
-
-					// Get the piece at the beginning, push it on the front of the array
-					// Change its position based on direction
-					var back = new SnakePiece(this.snakePieces[0].position.x, this.snakePieces[0].position.y);
-					back.position.x = this.snakePieces[this.snakePieces.length - 1].position.x;
-					back.position.y = this.snakePieces[this.snakePieces.length - 1].position.y;
-					back.position.x += this.direction.x;
-					back.position.y += this.direction.y;
-
-					if (canGoThroughWalls) {
-						canGoThroughWalls = false;
-						if (this.hitsWall(back.position.x,back.position.y)) {
-							if (back.position.x > BOARD_SIZE - 1) { // Hit right side
-								back.position.x = 0;
-							}
-							if (back.position.x < 0) { // Hit left side
-								back.position.x = BOARD_SIZE - 1;
-							}
-							if (back.position.y > BOARD_SIZE - 1) { // Hit bottom
-								back.position.y = 0;
-							}
-							if (back.position.y < 0) {
-								back.position.y = BOARD_SIZE - 1;
-							}
-						}
-						canGoThroughWalls = true;
-					}
-
-					resetColor(this.snakePieces);
-					back.color = SNAKE_HEAD_COLOR;
-					this.snakePieces.push(back);
-
-					// Check if I eat a food
-					if (CUR_FOOD.position.x == back.position.x && CUR_FOOD.position.y == back.position.y) {
-
-						// We need to create a new food
-						// We don't remove first piece, so snake grows longer
-						visible_pieces.splice(visible_pieces.indexOf(CUR_FOOD));
-						CUR_FOOD = generateRandomFood();
-						visible_pieces.push(CUR_FOOD);
-						updateScore();
-
-						// Speed up
-						if (GAME_SPEED > MAX_SPEED)
-							GAME_SPEED -= SPEED_CHANGE_INTERVAL;
-
-					} else {
-
-						// Remove first piece
-						this.snakePieces.shift();
-					}
-
-					// Check if hits wall or hits itself
-					var newx = back.position.x;
-					var newy = back.position.y;
-					if (this.hitsWall(newx,newy) || this.hitsSelf(newx,newy)) {
-
-						// Game over
-						gameover = true;
-					}
-					
-				}
-
-				this.hitsWall = function(x,y) {
-
-					if (canGoThroughWalls)
-						return false;
-
-					return (x < 0 || x > BOARD_SIZE - 1 || y > BOARD_SIZE - 1 || y < 0);
-				}
-
-				this.hitsSelf = function(x,y) {
-
-					for (var i = this.snakePieces.length - 2; i >= 0; i--) {
-
-						if (this.snakePieces[i].position.x == x && this.snakePieces[i].position.y == y)
-							return true;
-					}
-
-					return false;
-				}
-			}
+			
 
 			function redraw() {
 
@@ -270,11 +106,6 @@
 				for (var i = 0; i < visible_pieces.length; i++) {
 					visible_pieces[i].draw();
 				}
-			}
-
-			function updateScore() {
-				SCORE++;
-				$('#score').html(SCORE);
 			}
 
 			function snakeMove() {
@@ -340,8 +171,7 @@
 				canvas.font = "26px Arial";
 				canvas.fillText("Game Over", SQUARE_SIZE * (BOARD_SIZE / 6), SQUARE_SIZE * 5);
 				canvas.font = "17px Arial";
-				canvas.fillText("Press Enter to Play again", SQUARE_SIZE * (BOARD_SIZE / 12), SQUARE_SIZE * 7)
-				newHighScore();
+				//newHighScore();
 			}
 
 			function startGame() {
@@ -366,25 +196,6 @@
 			// Set up Game
 			visible_pieces.push(snake);
 			visible_pieces.push(CUR_FOOD);
-
-			// Add event listeners
-			$(document).keydown(function(e){
-				if (e.which == KEYBOARD_RIGHT && snake.direction != LEFT) {
-					NEXT_DIRECTION = RIGHT;
-				}
-				else if (e.which == KEYBOARD_LEFT && snake.direction != RIGHT) {
-					NEXT_DIRECTION = LEFT;
-				}
-				else if (e.which == KEYBOARD_DOWN && snake.direction != UP) {
-					NEXT_DIRECTION = DOWN;
-				}
-				else if (e.which == KEYBOARD_UP && snake.direction != DOWN) {
-					NEXT_DIRECTION = UP;
-				} 
-				else if (e.which == ENTER && gameover) {
-					startGame();
-				}
-			});
 
 			// start game
 			startGame();

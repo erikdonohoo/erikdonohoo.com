@@ -116,7 +116,7 @@ function SnakeCtrl($scope, $routeParams, $location) {
 	$scope.readytoleave = false;
 	$scope.gotonext = '';
 	$scope.$on('$locationChangeStart', function(event, next, current){
-		if(!$scope.readytoleave) {
+		if(!$scope.readytoleave && $scope.getLoggedInStatus()) {
 		    event.preventDefault();
 		    $scope.gotonext = next.substring(next.indexOf('#') + 1);
 		    $('#pageLeave').modal('show');
