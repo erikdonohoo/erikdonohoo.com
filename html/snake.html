@@ -1,4 +1,48 @@
+<style>
+	/* Snake Styles */
+	#snakecanvas {
+		border:1px double #aaa;
+		background:#fff;
+	}
+	.score-span {
+		margin-right:50px;
+		display:inline !important;
+	}
+	.score-span code {
+		font-size:22px;
+	}
+</style>
+
 <h2>Snake</h2>
+<hr>
+<div ng-controller="snakeController">
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span7">
+				<canvas id="snakecanvas" width="384" height="384"></canvas>
+				<button ng-show="!playing" class="btn btn-success" ng-click="togglePlay()">Start</button>
+				<button ng-show="playing" class="btn btn-warning" ng-click="togglePlay()">Pause</button>
+				<button ng-show="!playing && gameover" ng-click="saveScore()" class="btn btn-primary">Save</button>
+				<div class="span6 score-span pull-right text-right"><strong>SCORE: </strong><code>{{score | number:0}}</code></div>
+			</div>
+			<div class="span5">
+				<h4>About Snake</h4>
+				<p>
+					To control...
+				</p>
+				<p>
+					Use <span class="label label-info">I</span> for <i class="icon-arrow-up"></i><br>
+					Use <span class="label label-info">K</span> for <i class="icon-arrow-down"></i><br>
+					Use <span class="label label-info">J</span> for <i class="icon-arrow-left"></i><br>
+					Use <span class="label label-info">L</span> for <i class="icon-arrow-right"></i>
+				</p>
+				<p>
+					Try to collect as much food as you can!  You can go through walls but don't run into yourself or it's gameover!
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
 
 <!-- Modal -->
 <div id="pageLeave" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
