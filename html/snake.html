@@ -39,6 +39,11 @@
 				<p>
 					Try to collect as much food as you can!  You can go through walls but don't run into yourself or it's gameover!
 				</p>
+				<div ng-show="!loggedIn">
+					<p>
+						To view high scores and your personal best, <a class="btn btn-success" href="#/register">Register</a> or <a class="btn btn-primary" href="#/signin">Sign in</a>
+					</p>
+				</div>
 				<div ng-show="loggedIn">
 					<hr>
 					<h4 class="text-warning">Personal Best: <code class="text-info" style="font-size:22px;">{{personalBest}}</code></h4>
@@ -48,15 +53,18 @@
 							<tr>
 								<th>Player</th>
 								<th>Score</th>
+								<th>Date</th>
 							</tr>
 						</thead>
 						<tbody>
 							<tr ng-repeat="score in scores">
 								<td>{{score.attributes.user.attributes.username}}</td>
 								<td>{{score.attributes.score}}</td>
+								<td>{{score.createdAt | date:'MM-d-yyyy'}}</td>
 							</tr>
 						</tbody>
 					</table>
+					<button class="btn" ng-click="pullScores()">Refresh Scores</button>
 				</div>
 			</div>
 		</div>
