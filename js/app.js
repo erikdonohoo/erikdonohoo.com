@@ -81,7 +81,7 @@ app.run(function($rootScope, $route) {
 
  		$rootScope.signingOut = true;
  		if (!$rootScope.stillPlaying) {
- 			console.log('here');
+
  			Parse.User.logOut();
 	 		$rootScope.user = {};
 	 		$rootScope.toggleLogIn(false);
@@ -246,14 +246,14 @@ function SnakeCtrl($scope, $routeParams, $location) {
 	$scope.$on('$locationChangeStart', function(event, next, current){
 		if(!$scope.readytoleave && $scope.getLoggedInStatus() && $scope.getStillPlaying()) {
 		    event.preventDefault();
-		    $scope.gotonext = next.substring(next.indexOf('#') + 1);
+		    $scope.gotonext = '#' + next.substring(next.indexOf('#') + 1);
 		    $('#pageLeave').modal('show');
 		}
 	});
 
 	$scope.leave = function() {
 		$('#pageLeave').on('hidden', function() {
-			window.location = '#' + $scope.gotonext;
+			window.location = $scope.gotonext;
 		});
 		$('#pageLeave').modal('hide');
 		$scope.readytoleave = true;
@@ -299,8 +299,8 @@ function SnakeCtrl($scope, $routeParams, $location) {
 	var snake; //...................................// *** THE ACTUAL SNAKE ***
 	var NEXT_DIRECTION; //..........................// snakes next direction
 	var canGoThroughWalls = true;	//..............// whether snake can go through walls or not
-	var SNAKE_HEAD_COLOR = '#A80D0D';	//..........// color of snake head
-	var SNAKE_DEFAULT_COLOR = '#1D7E25';	//......// color of snake body
+	var SNAKE_HEAD_COLOR = '#adce18';	//..........// color of snake head
+	var SNAKE_DEFAULT_COLOR = '#2bff47';	//......// color of snake body
 	var visible_pieces = [];	//..................// pieces on screen to move and draw
 
 	// Pause/Start gameplay
@@ -361,6 +361,14 @@ function SnakeCtrl($scope, $routeParams, $location) {
 
 		// Draw initial game screen
 		// TODO
+		snake = new Snake();
+		NEXT_DIRECTION = RIGHT;
+		GAME_SPEED = 300;
+		visible_pieces = new Array();
+		visible_pieces.push(snake);
+		$scope.gameover = false;
+		$scope.score = 0;
+		redraw();
 	}
 
 	// Save score
@@ -402,11 +410,28 @@ function SnakeCtrl($scope, $routeParams, $location) {
 	function Food(x,y) {
 
 		this.position = new Position(x,y);
+		var colorPick = ['0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'];
+		var c1 = Math.floor(Math.random() * colorPick.length);
+		var col1 = (c1 == colorPick.length) ? 'f' : colorPick[c1];
+		var c2 = Math.floor(Math.random() * colorPick.length);
+		var col2 = (c2 == colorPick.length) ? 'f' : colorPick[c2];
+		var c3 = Math.floor(Math.random() * colorPick.length);
+		var col3 = (c3 == colorPick.length) ? 'f' : colorPick[c3];
+		var c4 = Math.floor(Math.random() * colorPick.length);
+		var col4 = (c4 == colorPick.length) ? 'f' : colorPick[c4];
+		var c5 = Math.floor(Math.random() * colorPick.length);
+		var col5 = (c5 == colorPick.length) ? 'f' : colorPick[c5];
+		var c6 = Math.floor(Math.random() * colorPick.length);
+		var col6 = (c6 == colorPick.length) ? 'f' : colorPick[c6];
+		this.style = '#' + col1 + col2 + col3 + col4 + col5 + col6;
 
 		// Draw food
 		this.draw = function() {
 
-			canvas.fillStyle = '#333333';
+			
+			canvas.fillStyle = this.style;
+			canvas.fillRect((SQUARE_SIZE * this.position.x) + GAP_SIZE, (SQUARE_SIZE * this.position.y) + GAP_SIZE, SNAKE_PIECE_SIZE, SNAKE_PIECE_SIZE);
+			canvas.strokeStyle = '#eeeeee';
 			canvas.strokeRect((SQUARE_SIZE * this.position.x) + GAP_SIZE, (SQUARE_SIZE * this.position.y) + GAP_SIZE, SNAKE_PIECE_SIZE, SNAKE_PIECE_SIZE);
 		}
 	}
@@ -422,6 +447,8 @@ function SnakeCtrl($scope, $routeParams, $location) {
 
 			canvas.fillStyle = this.color;
 			canvas.fillRect((SQUARE_SIZE * this.position.x) + GAP_SIZE, (SQUARE_SIZE * this.position.y) + GAP_SIZE, SNAKE_PIECE_SIZE, SNAKE_PIECE_SIZE);
+			canvas.strokeStyle = '#eee';
+			canvas.strokeRect((SQUARE_SIZE * this.position.x) + GAP_SIZE, (SQUARE_SIZE * this.position.y) + GAP_SIZE, SNAKE_PIECE_SIZE, SNAKE_PIECE_SIZE);
 		}
 	}
 
@@ -542,10 +569,94 @@ function SnakeCtrl($scope, $routeParams, $location) {
 		}
 	}
 
+	function drawBoard() {
+
+		// Background
+		canvas.fillStyle = '#222222';
+		canvas.fillRect(0,0,BOARD_SIZE * SQUARE_SIZE, BOARD_SIZE * SQUARE_SIZE);
+
+		// Square pieces
+		for (var i = 0; i < BOARD_SIZE; i++) {
+
+			for (var j = 0; j < BOARD_SIZE; j++) {
+
+				var x = i * SQUARE_SIZE;
+				var y = j * SQUARE_SIZE;
+
+				// Draw 4 triangles per spot
+				canvas.beginPath();
+				canvas.moveTo(x + GAP_SIZE,y);
+				canvas.lineTo(x,y);
+				canvas.lineTo(x, y + GAP_SIZE);
+				canvas.closePath();
+				canvas.fillStyle = '#ffffff';
+				canvas.fill();
+
+				canvas.beginPath();
+				canvas.moveTo(x + GAP_SIZE, y + SQUARE_SIZE);
+				canvas.lineTo(x, y + SQUARE_SIZE);
+				canvas.lineTo(x, y + SQUARE_SIZE - GAP_SIZE);
+				canvas.closePath();
+				canvas.fillStyle = '#ffffff';
+				canvas.fill();
+
+				canvas.beginPath();
+				canvas.moveTo(x + SQUARE_SIZE, y + GAP_SIZE);
+				canvas.lineTo(x + SQUARE_SIZE, y);
+				canvas.lineTo(x + SQUARE_SIZE - GAP_SIZE, y);
+				canvas.closePath();
+				canvas.fillStyle = '#ffffff';
+				canvas.fill();
+
+				canvas.beginPath();
+				canvas.moveTo(x + SQUARE_SIZE, y + SQUARE_SIZE - GAP_SIZE);
+				canvas.lineTo(x + SQUARE_SIZE, y + SQUARE_SIZE);
+				canvas.lineTo(x + SQUARE_SIZE - GAP_SIZE, y + SQUARE_SIZE);
+				canvas.closePath();
+				canvas.fillStyle = '#ffffff';
+				canvas.fill();
+
+				canvas.lineWidth = '1';
+				canvas.beginPath();
+				canvas.moveTo(x + GAP_SIZE,y);
+				canvas.lineTo(x,y);
+				canvas.lineTo(x, y + GAP_SIZE);
+				canvas.closePath();
+				canvas.strokeStyle = '#000000';
+				canvas.stroke();
+
+				canvas.beginPath();
+				canvas.moveTo(x + GAP_SIZE, y + SQUARE_SIZE);
+				canvas.lineTo(x, y + SQUARE_SIZE);
+				canvas.lineTo(x, y + SQUARE_SIZE - GAP_SIZE);
+				canvas.closePath();
+				canvas.strokeStyle = '#000000';
+				canvas.stroke();
+
+				canvas.beginPath();
+				canvas.moveTo(x + SQUARE_SIZE, y + GAP_SIZE);
+				canvas.lineTo(x + SQUARE_SIZE, y);
+				canvas.lineTo(x + SQUARE_SIZE - GAP_SIZE, y);
+				canvas.closePath();
+				canvas.strokeStyle = '#000000';
+				canvas.stroke();
+
+				canvas.beginPath();
+				canvas.moveTo(x + SQUARE_SIZE, y + SQUARE_SIZE - GAP_SIZE);
+				canvas.lineTo(x + SQUARE_SIZE, y + SQUARE_SIZE);
+				canvas.lineTo(x + SQUARE_SIZE - GAP_SIZE, y + SQUARE_SIZE);
+				canvas.closePath();
+				canvas.strokeStyle = '#000000';
+				canvas.stroke();
+			}
+		}
+	}
+
 	// Redraw everything on screen
 	function redraw() {
 
-		canvas.clearRect(0,0,BOARD_SIZE * SQUARE_SIZE, BOARD_SIZE * SQUARE_SIZE);
+		// Draw Board
+		drawBoard();
 		for (var i = 0; i < visible_pieces.length; i++) {
 			visible_pieces[i].draw();
 		}
@@ -616,7 +727,7 @@ function SnakeCtrl($scope, $routeParams, $location) {
 	// handle end of game
 	function gameOver() {
 
-		canvas.clearRect(0,0,BOARD_SIZE * SQUARE_SIZE, BOARD_SIZE * SQUARE_SIZE);
+		drawBoard();
 		canvas.font = "26px Arial";
 		canvas.textAlign = 'center';
 		canvas.fillText("Game Over", 192,192);
