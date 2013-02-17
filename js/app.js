@@ -80,21 +80,23 @@ app.run(function($rootScope, $route) {
  	$rootScope.signout = function(wantsToLeave) {
 
  		$rootScope.signingOut = true;
- 		if (!$rootScope.onGamePage) {
+ 		if (!$rootScope.stillPlaying) {
+ 			console.log('here');
  			Parse.User.logOut();
 	 		$rootScope.user = {};
 	 		$rootScope.toggleLogIn(false);
 	 		$rootScope.signingOut = false;
 	 		window.location = '#/';
  		}
- 		if ($rootScope.stillPlaying && wantsToLeave || !$rootScope.stillPlaying && !wantsToLeave) {
-	 		Parse.User.logOut();
-	 		$rootScope.user = {};
-	 		$rootScope.toggleLogIn(false);
-	 		$rootScope.signingOut = false;
-	 		var wasPlaying = $rootScope.stillPlaying;
-	 		$rootScope.stillPlaying = false;
+ 		else if ($rootScope.stillPlaying && wantsToLeave) {
+	 
 	 		$('#pageLeave').on('hidden', function(){
+	 			Parse.User.logOut();
+		 		$rootScope.user = {};
+		 		$rootScope.toggleLogIn(false);
+		 		$rootScope.signingOut = false;
+		 		var wasPlaying = $rootScope.stillPlaying;
+		 		$rootScope.stillPlaying = false;
 	 			window.location = '#/';
 	 		});
 	 		$('#pageLeave').modal('hide');
@@ -122,15 +124,6 @@ app.run(function($rootScope, $route) {
 	}
 	$rootScope.setStillPlaying = function(playing) {
 		$rootScope.stillPlaying = playing;
-	}
-
-	// On game page
-	$rootScope.onGamePage = false;
-	$rootScope.getOnGamePage = function() {
-		return $rootScope.onGamePage;
-	}
-	$rootScope.setOnGamePage = function(onPage) {
-		$rootScope.onGamePage = onPage;
 	}
 
 	// Snake Scores
@@ -178,7 +171,7 @@ function SnakeCtrl($scope, $routeParams, $location) {
 	$scope.personalBest = 0;
 	$scope.scores = [];
 	$scope.loading = false;
-	$scope.setOnGamePage(true);
+	$scope.setStillPlaying(false);
 
 	// Get high scores
 	$scope.pullScores = function(refresh) {
@@ -243,7 +236,7 @@ function SnakeCtrl($scope, $routeParams, $location) {
 
 	$scope.leave = function() {
 		$('#pageLeave').on('hidden', function() {
-			window.location = '#/';
+			window.location = '#' + $scope.gotonext;
 		});
 		$('#pageLeave').modal('hide');
 		$scope.readytoleave = true;
