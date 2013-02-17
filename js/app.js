@@ -698,7 +698,7 @@ function SnakeCtrl($scope, $routeParams, $location) {
 		for (var i = 0; i < snake.snakePieces.length; i++) {
 
 			if (snake.snakePieces[i].position.x == pos.x && snake.snakePieces[i].position.y == pos.y) {
-				conflict == true;
+				conflict = true;
 				break;
 			}
 		}
@@ -710,7 +710,9 @@ function SnakeCtrl($scope, $routeParams, $location) {
 	function generateRandomFood() {
 
 		var x = Math.floor((Math.random() * BOARD_SIZE));
+		x = (x == BOARD_SIZE) ? 0 : x;
 		var y = Math.floor((Math.random() * BOARD_SIZE));
+		y = (y == BOARD_SIZE) ? 0 : y;
 
 		var pos = new Position(x,y);
 
