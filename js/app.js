@@ -117,6 +117,22 @@ app.run(function($rootScope, $route) {
 		$rootScope.stillPlaying = playing;
 	}
 
+	// Snake Scores
+	$rootScope.snakeScores = [];
+	$rootScope.snakeBest = 0;
+	$rootScope.getSnakeScores = function() {
+		return $rootScope.snakeScores;
+	}
+	$rootScope.setSnakeScores = function(scores) {
+		$rootScope.snakeScores = scores;
+	}
+	$rootScope.getSnakeBest = function() {
+		return $rootScope.snakeBest;
+	}
+	$rootScope.setSnakeBest = function(best) {
+		$rootScope.snakeBest = best;
+	}
+
 });
 
 
@@ -145,42 +161,55 @@ function SnakeCtrl($scope, $routeParams, $location) {
 
 	$scope.personalBest = 0;
 	$scope.scores = [];
+	$scope.loading = false;
 
 	// Get high scores
-	$scope.pullScores = function() {
+	$scope.pullScores = function(refresh) {
 
-		var SnakeScore = Parse.Object.extend('SnakeScore');
-		var query = new Parse.Query(SnakeScore);
-		query.descending('score');
-		query.include('user');
-		query.limit(10);
-		query.find({
-			success:function(results) {
-				// Got top scores
-				$scope.scores = results;
-				$scope.$apply();
-			},
-			error:function(error) {
-				// Error getting scores
-			}
-		});
-		var pquery = new Parse.Query(SnakeScore);
-		query.equalTo('user', $scope.getUser());
-		query.descending('score');
-		query.first({
-			success:function(result) {
-				// Got personal best
-				$scope.personalBest = result.attributes.score;
-				$scope.$apply();
-			},
-			error:function(error) {
-				// Error
-			}
-		});
+		if (refresh || $scope.getSnakeScores().length == 0) {
+
+			$scope.loading = true;
+			var SnakeScore = Parse.Object.extend('SnakeScore');
+			var query = new Parse.Query(SnakeScore);
+			query.descending('score');
+			query.include('user');
+			query.limit(10);
+			query.find({
+				success:function(results) {
+					// Got top scores
+					$scope.scores = results;
+					$scope.setSnakeScores($scope.scores);
+					$scope.loading = false;
+					$scope.$apply();
+				},
+				error:function(error) {
+					// Error getting scores
+				}
+			});
+			var pquery = new Parse.Query(SnakeScore);
+			query.equalTo('user', $scope.getUser());
+			query.descending('score');
+			query.first({
+				success:function(result) {
+					// Got personal best
+					$scope.personalBest = result.attributes.score;
+					$scope.setSnakeBest($scope.personalBest);
+					$scope.$apply();
+				},
+				error:function(error) {
+					// Error
+				}
+			});
+
+		} else {
+
+			$scope.scores = $scope.getSnakeScores();
+			$scope.personalBest = $scope.getSnakeBest();
+		}
 	}
 
 	if ($scope.getLoggedInStatus()) {
-		$scope.pullScores();
+		$scope.pullScores(false);
 	}
 
 	// THIS CODE PREVENTS A PAGE CHANGE
