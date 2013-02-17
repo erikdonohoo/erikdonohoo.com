@@ -9,6 +9,3 @@ Homepage for erikdonohoo.com
 3. Space Invaderz Game
 
 Each game is up for grabs for anyone that wants to see how it works
-
-TODO:
-+ Add error handlers for score pulls in snake
