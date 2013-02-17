@@ -80,6 +80,13 @@ app.run(function($rootScope, $route) {
  	$rootScope.signout = function(wantsToLeave) {
 
  		$rootScope.signingOut = true;
+ 		if (!$rootScope.onGamePage) {
+ 			Parse.User.logOut();
+	 		$rootScope.user = {};
+	 		$rootScope.toggleLogIn(false);
+	 		$rootScope.signingOut = false;
+	 		window.location = '#/';
+ 		}
  		if ($rootScope.stillPlaying && wantsToLeave || !$rootScope.stillPlaying && !wantsToLeave) {
 	 		Parse.User.logOut();
 	 		$rootScope.user = {};
@@ -115,6 +122,15 @@ app.run(function($rootScope, $route) {
 	}
 	$rootScope.setStillPlaying = function(playing) {
 		$rootScope.stillPlaying = playing;
+	}
+
+	// On game page
+	$rootScope.onGamePage = false;
+	$rootScope.getOnGamePage = function() {
+		return $rootScope.onGamePage;
+	}
+	$rootScope.setOnGamePage = function(onPage) {
+		$rootScope.onGamePage = onPage;
 	}
 
 	// Snake Scores
@@ -162,6 +178,7 @@ function SnakeCtrl($scope, $routeParams, $location) {
 	$scope.personalBest = 0;
 	$scope.scores = [];
 	$scope.loading = false;
+	$scope.setOnGamePage(true);
 
 	// Get high scores
 	$scope.pullScores = function(refresh) {
