@@ -143,10 +143,12 @@ function SnakeCtrl($scope, $routeParams, $location) {
 
 	$scope.setPageName('snake');
 
+	$scope.personalBest = 0;
+	$scope.scores = [];
+
 	// Get high scores
 	$scope.pullScores = function() {
 
-		$scope.scores = [];
 		var SnakeScore = Parse.Object.extend('SnakeScore');
 		var query = new Parse.Query(SnakeScore);
 		query.descending('score');
@@ -162,7 +164,6 @@ function SnakeCtrl($scope, $routeParams, $location) {
 				// Error getting scores
 			}
 		});
-		$scope.personalBest = 0;
 		var pquery = new Parse.Query(SnakeScore);
 		query.equalTo('user', $scope.getUser());
 		query.descending('score');
