@@ -114,7 +114,7 @@ app.run(function($rootScope, $route) {
 
 		$rootScope.setUser(user);
 		$rootScope.toggleLogIn(true);
-		window.location = '#/';
+		window.location = $rootScope.lastPage;
 	}
 
 	// Score Saved (Any game)
@@ -141,6 +141,15 @@ app.run(function($rootScope, $route) {
 	$rootScope.setSnakeBest = function(best) {
 		$rootScope.snakeBest = best;
 	}
+
+	// Keep track of last page
+	$rootScope.lastPage = ''
+	$rootScope.getLastPage = function() {
+		return $rootScope.lastPage;
+	}
+	$rootScope.$on('$locationChangeStart', function(event, next, current){
+		$rootScope.lastPage = '#' + current.substring(current.indexOf('#') + 1);
+	});
 
 });
 
