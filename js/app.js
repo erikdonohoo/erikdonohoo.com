@@ -347,7 +347,6 @@ function SnakeCtrl($scope, $routeParams, $location) {
 			snakescore.set('score', $scope.score);
 			snakescore.set('user', $scope.getUser());
 
-			console.log('saving');
 			$('#savescorebutton').button('loading');
 			snakescore.save(null,{
 				success: function(score) {
@@ -355,6 +354,7 @@ function SnakeCtrl($scope, $routeParams, $location) {
 					$('#savescorebutton').button('complete');
 					$scope.scoreToSave = false;
 					$scope.setStillPlaying(false);
+					$scope.pullScores(true);
 					$scope.$apply();
 				},
 				error: function(score, error) {

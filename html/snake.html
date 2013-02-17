@@ -11,6 +11,9 @@
 	.score-span code {
 		font-size:22px;
 	}
+	.emph {
+		font-weight:700;
+	}
 </style>
 
 <h2>Snake</h2>
@@ -58,9 +61,9 @@
 						</thead>
 						<tbody>
 							<tr ng-repeat="score in scores">
-								<td>{{score.attributes.user.attributes.username}}</td>
-								<td>{{score.attributes.score}}</td>
-								<td>{{score.createdAt | date:'MM-d-yyyy'}}</td>
+								<td ng-class="{'text-info emph' : getUser().attributes.username == score.attributes.user.attributes.username}">{{score.attributes.user.attributes.username}}</td>
+								<td ng-class="{'text-info emph' : getUser().attributes.username == score.attributes.user.attributes.username}">{{score.attributes.score}}</td>
+								<td ng-class="{'text-info emph' : getUser().attributes.username == score.attributes.user.attributes.username}">{{score.createdAt | date:'MM-d-yyyy'}}</td>
 							</tr>
 						</tbody>
 					</table>
