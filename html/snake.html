@@ -39,6 +39,25 @@
 				<p>
 					Try to collect as much food as you can!  You can go through walls but don't run into yourself or it's gameover!
 				</p>
+				<div ng-show="loggedIn">
+					<hr>
+					<h4 class="text-warning">Personal Best: <code class="text-info" style="font-size:22px;">{{personalBest}}</code></h4>
+					<h4 class="text-success">High Scores</h4>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Player</th>
+								<th>Score</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="score in scores">
+								<td>{{score.attributes.user.attributes.username}}</td>
+								<td>{{score.attributes.score}}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
 			</div>
 		</div>
 	</div>

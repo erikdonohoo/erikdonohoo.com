@@ -143,6 +143,38 @@ function SnakeCtrl($scope, $routeParams, $location) {
 
 	$scope.setPageName('snake');
 
+	// Get high scores
+	$scope.scores = [];
+	var SnakeScore = Parse.Object.extend('SnakeScore');
+	var query = new Parse.Query(SnakeScore);
+	query.descending('score');
+	query.include('user');
+	query.limit(10);
+	query.find({
+		success:function(results) {
+			// Got top scores
+			$scope.scores = results;
+			$scope.$apply();
+		},
+		error:function(error) {
+			// Error getting scores
+		}
+	});
+	$scope.personalBest = 0;
+	var pquery = new Parse.Query(SnakeScore);
+	query.equalTo('user', $scope.getUser());
+	query.descending('score');
+	query.first({
+		success:function(result) {
+			// Got personal best
+			$scope.personalBest = result.attributes.score;
+			$scope.$apply();
+		},
+		error:function(error) {
+			// Error
+		}
+	});
+
 	// THIS CODE PREVENTS A PAGE CHANGE
 	$scope.readytoleave = false;
 	$scope.gotonext = '';
