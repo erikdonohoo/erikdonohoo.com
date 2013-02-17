@@ -205,6 +205,9 @@ function SnakeCtrl($scope, $routeParams, $location) {
 				},
 				error:function(error) {
 					// Error getting scores
+					$scope.snakeerror = true;
+					$scope.errormessage = error.message;
+					$scope.$apply();
 				}
 			});
 			var pquery = new Parse.Query(SnakeScore);
@@ -219,6 +222,9 @@ function SnakeCtrl($scope, $routeParams, $location) {
 				},
 				error:function(error) {
 					// Error
+					$scope.snakeerror = true;
+					$scope.errormessage = error.message;
+					$scope.$apply();
 				}
 			});
 
