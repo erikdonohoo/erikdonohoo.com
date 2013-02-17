@@ -159,6 +159,8 @@ function HomeCtrl($scope, $routeParams, $location, $route) {
 function GamesCtrl($scope, $routeParams, $location) {
 
 	$scope.setPageName('games');
+
+	$('.game-popover').popover({ placement: 'bottom', html: true});
 }
 
 //*****************************************************************************
