@@ -301,6 +301,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 			if ($scope.paused) {
 
 				clearTimeout(timer);
+				document.getElementById('theme').pause();
 
 			} else {
 
@@ -340,10 +341,18 @@ function MarioCtrl($scope, $routeParams, $location) {
 			}
 			else if (e.which == KEYBOARD_UP) {
 				e.preventDefault();
-				mario.movingUp = true;
+				if (!mario.inAir) {
+					mario.movingUp = true;
+					mario.inAir = true;
+					document.getElementById('boing').load();
+					document.getElementById('boing').play();
+				}
 				if (mario.inAir && !mario.doubleJumping && mario.canDoubleJump) {
 					mario.doubleJumping = true;
+					mario.canDoubleJump = false;
 					mario.upVelocity = mario.jumpSpeed;
+					document.getElementById('boing').load();
+					document.getElementById('boing').play();
 				}
 			}
 		});
@@ -478,6 +487,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 		var marioYCrop = 48;
 		var marioJumpXCrop = 271;
 		var marioCrouchXCrop = 379;
+		var marioPushXCrop = 252;
 		var marioCrouchYCrop = 57;
 		var marioImgWidth = 16;
 		var marioImgHeight = 27;
@@ -528,17 +538,8 @@ function MarioCtrl($scope, $routeParams, $location) {
 
 		this.move = function() {
 
-			if (this.movingUp) {
+			if (this.inAir) {
 				this.y -= this.upVelocity;
-				this.upVelocity -= this.decceleration;
-				this.inAir = true;
-			}
-			else if (!this.movingUp && this.y < MARIO_START_Y) {
-				this.y -= this.upVelocity;
-				if (this.upVelocity > fallSpeed) {
-					this.upVelocity = fallSpeed;
-				}
-
 				this.upVelocity -= this.decceleration;
 			}
 
@@ -594,6 +595,8 @@ function MarioCtrl($scope, $routeParams, $location) {
 
 		background = new Background();
 		mario = new Mario();
+		document.getElementById('theme').load();
+		document.getElementById('theme').play();
 		gameLoop();
 	}
 
