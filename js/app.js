@@ -814,8 +814,8 @@ function MarioCtrl($scope, $routeParams, $location) {
 	var minEnemyTime = 100;
 	var MINMIN = 30;
 	var MINMAX = 120;
-	var speedUpMax = 2;
-	var speedUpMin = 1;
+	var speedUpMax = 4;
+	var speedUpMin = 2;
 	var curTime = Math.floor(Math.random() * (maxEnemyTime - minEnemyTime)) + minEnemyTime;
 	var enemyCounter = 0;
 	var totalKindsOfEnemy = 11;
