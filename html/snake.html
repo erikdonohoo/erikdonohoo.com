@@ -22,7 +22,7 @@
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="span7">
-				<canvas id="snakecanvas" width="384" height="384"></canvas>
+				<canvas id="snakecanvas" width="384" height="384"></canvas><br>
 				<button ng-show="paused || !started" class="btn btn-success" ng-click="togglePlay()">Start</button>
 				<button ng-show="started && !paused" class="btn btn-warning" ng-click="togglePlay()">Pause</button>
 				<button ng-class="{'btn-primary': scoreToSave, 'btn-link': !scoreToSave}" id="savescorebutton" data-loading-text="Saving..." data-complete-text="Score Saved!" ng-show="!paused && gameover && loggedIn" ng-click="saveScore()" class="btn">Save that Score!</button>
