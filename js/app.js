@@ -314,6 +314,8 @@ function MarioCtrl($scope, $routeParams, $location) {
 		} else {
 
 			// Kick off initial start
+			// Reset save button
+			$('#savescorebutton').button('reset');
 			$scope.started = true;
 			$scope.gameover = false;
 			$scope.setStillPlaying(true);
@@ -566,6 +568,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 				this.inAir = false;
 				this.doubleJumping = false;
 				this.canDoubleJump = false;
+				mario.removeTouches();
 			} else if (this.y > MARIO_START_Y + (marioHeight - marioCrouchHeight) && !this.dying) {
 				this.y = MARIO_START_Y + (marioHeight - marioCrouchHeight);
 				this.upVelocity = jumpSpeed;
@@ -573,7 +576,16 @@ function MarioCtrl($scope, $routeParams, $location) {
 				this.inAir = false;
 				this.doubleJumping = false;
 				this.canDoubleJump = false;
+				mario.removeTouches();
 			}
+		}
+
+		this.removeTouches = function() {
+
+			for (var i = enemies.length - 1; i >= 0; i--) {
+				if (enemies[i].marioTouched)
+					enemies[i].marioTouched = false;
+			};
 		}
 	}
 
@@ -722,6 +734,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 		this.marioOn = false;
 
 		this.canWalkOn = true;
+		this.marioTouched = false;
 
 		this.draw = function() {
 			canvas.drawImage(pencil, this.x, this.y, this.width, this.height);
@@ -890,6 +903,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 					if (cur.canBeKilled  || cur.canWalkOn) {
 
 						var bottom = mario.y + mario.height;
+						var curbottom = cur.y + cur.height;
 						if (bottom - cur.y <= Math.abs(mario.upVelocity) || bottom - cur.y <= accuracy) { // Use moving speed for accuracy tolerance
 
 							if (cur.canBeKilled) {
@@ -901,7 +915,6 @@ function MarioCtrl($scope, $routeParams, $location) {
 							else {
 								// Mario walks on it
 								if (!cur.marioOn) {
-
 									cur.marioOn = true;
 									mario.inAir = false;
 									mario.y = cur.y - mario.height;
@@ -912,7 +925,14 @@ function MarioCtrl($scope, $routeParams, $location) {
 								}
 							}
 
-						} else {
+						} else if (mario.y - curbottom <= Math.abs(mario.upVelocity) && cur.canWalkOn) { // hit bottom of pencil
+							if (!cur.marioTouched) {
+								cur.marioTouched = true;
+								mario.upVelocity = 0;
+								mario.doubleJumping = true;
+								mario.inAir = true;
+							}
+						}else {
 
 							$scope.gameover = true;
 							$scope.$apply();
@@ -940,7 +960,9 @@ function MarioCtrl($scope, $routeParams, $location) {
 				if (withinY(coin,mario)) {
 
 					// Collect coin
-					coin.offScreen = true;;
+					coin.offScreen = true;
+					document.getElementById('chime').load();
+					document.getElementById('chime').play();
 					// Play sound
 					$scope.score++;
 					$scope.$apply();
@@ -1013,7 +1035,6 @@ function MarioCtrl($scope, $routeParams, $location) {
 	// mario die animation
 	function marioDie() {
 
-		console.log('draw die');
 		background.draw();
 		for (var i = enemies.length - 1; i >= 0; i--) {
 			enemies[i].draw();
