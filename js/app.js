@@ -412,6 +412,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 	// Objects
 	var background;
 	var mario;
+	var enemies = [];
 
 	// Define background, and all its movement
 	function Background() {
@@ -467,6 +468,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 		}
 	}
 
+	// Mario character
 	function Mario() {
 
 		var self = this;
@@ -558,12 +560,70 @@ function MarioCtrl($scope, $routeParams, $location) {
 		}
 	}
 
+	// Define bullet bill enemies
+	function BulletBill() {
+
+		var self = this;
+		this.width = 70 * (3/4);
+		this.height = 50 * (3/4);
+		this.x = BOARD_SIZE + this.width;
+		var notTooHigh = 100;
+		this.y = Math.floor(Math.random() * (BOARD_SIZE - GROUND_HEIGHT - this.height - notTooHigh)) + notTooHigh;
+		var bill = new Image();
+		var speed = 3;
+		bill.src = '../img/mario/bulletbill.png';
+		bill.onload = function() { self.draw(); };
+
+		this.offScreen = false;
+
+		this.draw = function() {
+
+			canvas.drawImage(bill, this.x, this.y, this.width, this.height);
+		}
+
+		this.move = function() {
+
+			this.x -= speed;
+			if (this.x + this.width < 0)
+				this.offScreen = true;
+		}
+	}
+
 	// Setup game objects, start loop
 	function startGame() {
 
 		background = new Background();
 		mario = new Mario();
 		gameLoop();
+	}
+
+	// Create enemies at random intervals
+	var maxEnemyTime = 450;
+	var minEnemyTime = 100;
+	var curTime = Math.floor(Math.random() * (maxEnemyTime - minEnemyTime)) + minEnemyTime;
+	var enemyCounter = 0;
+	var totalKindsOfEnemy = 1;
+	function createEnemies() {
+
+		if (enemyCounter < curTime) {
+			enemyCounter++;
+		} else {
+			// Create enemy
+			var which = Math.floor(Math.random() * totalKindsOfEnemy);
+			var enemy;
+			switch (which) {
+
+				case 0:
+					enemy = new BulletBill();
+					break;
+				default:
+					enemy = new BulletBill();
+			}
+
+			enemies.push(enemy);
+			curTime = Math.floor(Math.random() * (maxEnemyTime - minEnemyTime)) + minEnemyTime;
+			enemyCounter = 0;
+		}
 	}
 
 	// Game loop
@@ -573,6 +633,18 @@ function MarioCtrl($scope, $routeParams, $location) {
 		background.draw();
 		mario.draw();
 		mario.move();
+		createEnemies();
+		var tempEnemies = [];
+		for (var i = enemies.length - 1; i >= 0; i--) {
+			enemies[i].move();
+			if (!enemies[i].offScreen)
+				tempEnemies.push(enemies[i]);
+		};
+		enemies = tempEnemies;
+		for (var i = enemies.length - 1; i >= 0; i--) {
+			enemies[i].draw();
+		};
+
 		timer = setTimeout(gameLoop, GAME_SPEED);
 	}
 
