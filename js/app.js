@@ -331,21 +331,33 @@ function MarioCtrl($scope, $routeParams, $location) {
 		$(document).bind('keydown',function(e){
 			if (e.which == KEYBOARD_DOWN) {
 				e.preventDefault();
-				console.log('down');
+				
+				if (!mario.crouching) {
+					mario.y = mario.y + (mario.normalHeight - mario.crouchHeight);
+					mario.height = mario.crouchHeight;
+					mario.crouching = true;
+				}
 			}
 			else if (e.which == KEYBOARD_UP) {
 				e.preventDefault();
-				console.log('up');
+				mario.movingUp = true;
+				if (mario.inAir && !mario.doubleJumping && mario.canDoubleJump) {
+					mario.doubleJumping = true;
+					mario.upVelocity = mario.jumpSpeed;
+				}
 			}
 		});
 		$(document).bind('keyup', function(e){
 			if (e.which == KEYBOARD_DOWN) {
 				e.preventDefault();
-				console.log('release down');
+				mario.crouching = false;
+				mario.y = mario.y - (mario.normalHeight - mario.crouchHeight);
+				mario.height = mario.normalHeight;
 			}
 			else if (e.which == KEYBOARD_UP) {
 				e.preventDefault();
-				console.log('release up');
+				mario.movingUp = false;
+				mario.canDoubleJump = true;
 			}
 		});
 
@@ -353,8 +365,6 @@ function MarioCtrl($scope, $routeParams, $location) {
 		// TODO
 		background = new Background();
 		mario = new Mario();
-		background.draw();
-		mario.draw();
 	}
 
 	// Save score
@@ -407,19 +417,25 @@ function MarioCtrl($scope, $routeParams, $location) {
 	function Background() {
 
 		// Ground
-		var ground = document.getElementById('marioground');
+		var self = this;
+		var ground = new Image();
+		ground.src = '../img/mario/marioground.png';
 		var groundwidth = 150;
 		var groundspeed = 1.5;
 		var groundcurposition = 0;
 		var groundminposition = -groundwidth;
 
 		// World
-		var world = document.getElementById('marioworld');
+		var world = new Image();
+		world.src = '../img/mario/marioworld.png';
 		var worldwidth = 3000;
 		var worldspeed = 0.75;
 		var worldcurposition = 0;
 		var worldminposition = -worldwidth;
 		var worldyclip = 100;
+
+		world.onload = function() { self.draw(); }
+		ground.onload = function() { self.draw(); }
 
 		this.draw = function() {
 
@@ -453,24 +469,92 @@ function MarioCtrl($scope, $routeParams, $location) {
 
 	function Mario() {
 
+		var self = this;
 		var marioWalkXCrop = 197;
-		var marioWalkYCrop = 48;
-		var marioWidth = 14;
-		var marioHeight = 27;
+		var marioWalkX2Crop = 214;
+		var curWalkXCrop = marioWalkXCrop;
+		var marioYCrop = 48;
+		var marioJumpXCrop = 271;
+		var marioCrouchXCrop = 379;
+		var marioCrouchYCrop = 57;
+		var marioImgWidth = 16;
+		var marioImgHeight = 27;
+		var marioCrouchImgHeight = 18;
+		var marioCrouchHeight = 18 * (3/2);
+		var marioWidth = marioImgWidth * (3/2);
+		var marioHeight = marioImgHeight * (3/2);
 		var MARIO_START_X = BOARD_SIZE / 3;
-		this.x = MARIO_START_X;
 		var MARIO_START_Y = BOARD_SIZE - (GROUND_HEIGHT + marioHeight);
+		var mario = new Image();
+		var jumpSpeed = 6.5;
+		var fallSpeed = 3;
+		var walkFrames = 13;
+		var walkCount = 0;
+		mario.src = '../img/mario/mariogood.png';
+		mario.onload = function() { self.draw(); };
+
 		this.y = MARIO_START_Y;
-		var mario = document.getElementById('mario');
+		this.x = MARIO_START_X;
+		this.jumpSpeed = jumpSpeed;
+		this.movingUp = false;
+		this.doubleJumping = false;
+		this.inAir = false;
+		this.upVelocity = jumpSpeed;
+		this.decceleration = 0.18;
+		this.normalHeight = marioHeight;
+		this.crouchHeight = marioCrouchHeight;
+		this.height = marioHeight;
+		this.width = marioWidth;
 
 		this.draw = function() {
 
-			canvas.drawImage(mario, marioWalkXCrop, marioWalkYCrop, marioWidth, marioHeight, this.x, this.y, marioWidth, marioHeight);
+			if (this.crouching) {
+				canvas.drawImage(mario, marioCrouchXCrop, marioCrouchYCrop, marioImgWidth, marioCrouchImgHeight, this.x, this.y, this.width, this.height);
+			}
+			else if (this.inAir) {
+				canvas.drawImage(mario, marioJumpXCrop, marioYCrop, marioImgWidth, marioImgHeight, this.x, this.y, this.width, this.height);
+			} else {
+				walkCount++;
+				if (walkCount == walkFrames) {
+					walkCount = 0;
+					curWalkXCrop = (curWalkXCrop == marioWalkXCrop) ? marioWalkX2Crop : marioWalkXCrop;
+				}
+
+				canvas.drawImage(mario, curWalkXCrop, marioYCrop, marioImgWidth, marioImgHeight, this.x, this.y, this.width, this.height);
+			}
 		}
 
 		this.move = function() {
 
-			this.x += 0.2;
+			if (this.movingUp) {
+				this.y -= this.upVelocity;
+				this.upVelocity -= this.decceleration;
+				this.inAir = true;
+			}
+			else if (!this.movingUp && this.y < MARIO_START_Y) {
+				this.y -= this.upVelocity;
+				if (this.upVelocity > fallSpeed) {
+					this.upVelocity = fallSpeed;
+				}
+
+				this.upVelocity -= this.decceleration;
+			}
+
+			if (this.y > MARIO_START_Y && !this.crouching) {
+				this.y = MARIO_START_Y;
+				this.upVelocity = jumpSpeed;
+				this.movingUp = false;
+				this.inAir = false;
+				this.doubleJumping = false;
+				this.canDoubleJump = false;
+			} else if (this.y > MARIO_START_Y + (marioHeight - marioCrouchHeight)) {
+				this.y = MARIO_START_Y + (marioHeight - marioCrouchHeight);
+				this.upVelocity = jumpSpeed;
+				this.movingUp = false;
+				this.inAir = false;
+				this.doubleJumping = false;
+				this.canDoubleJump = false;
+			}
 		}
 	}
 
@@ -488,6 +572,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 		background.move();
 		background.draw();
 		mario.draw();
+		mario.move();
 		timer = setTimeout(gameLoop, GAME_SPEED);
 	}
 
