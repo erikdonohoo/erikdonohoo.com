@@ -1,0 +1,82 @@
+<!-- Images for game -->
+<div style="display:none;">
+	<img src="img/mario/marioground.png" id="marioground" />
+	<img src="img/mario/marioworld.png" id="marioworld" />
+	<img src="img/mario/mariotrans.png" id="mario" />
+</div>
+
+<h2>Mario</h2>
+<hr>
+<div id="mariocontainer">
+	<div class="container-fluid">
+		<div class="row-fluid">
+			<div class="span7">
+				<canvas id="mariocanvas" width="400" height="400"></canvas>
+				<button ng-show="paused || !started" class="btn btn-success" ng-click="togglePlay()">Start</button>
+				<button ng-show="started && !paused" class="btn btn-warning" ng-click="togglePlay()">Pause</button>
+				<button ng-class="{'btn-primary': scoreToSave, 'btn-link': !scoreToSave}" id="savescorebutton" data-loading-text="Saving..." data-complete-text="Score Saved!" ng-show="!paused && gameover && loggedIn" ng-click="saveScore()" class="btn">Save that Score!</button>
+			</div>
+			<div class="span5">
+				<h4>About Mario</h4>
+				<p>
+					To control...
+				</p>
+				<p>
+					Use <span class="label label-info"><i class="icon-arrow-up"></i></span> to jump.  Tap twice for double-jump<br>
+					Use <span class="label label-info"><i class="icon-arrow-down"></i></span> to duck and slide while held
+				</p>
+				<p>
+					Kill enemies, earn extra lives, survive the onslaught and get as far as you can!
+				</p>
+				<div ng-show="!loggedIn">
+					<p>
+						To view high scores and your personal best, <a class="btn btn-success" href="#/register">Register</a> or <a class="btn btn-primary" href="#/signin">Sign in</a>
+					</p>
+				</div>
+				<div ng-show="loggedIn">
+					<hr>
+					<h4 class="text-warning">Personal Best: <code class="text-info" style="font-size:22px;">{{personalBest}}</code></h4>
+					<h4 class="text-success">High Scores</h4>
+					<table class="table table-striped">
+						<thead>
+							<tr>
+								<th>Player</th>
+								<th>Score</th>
+								<th>Date</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="score in scores">
+								<td ng-class="{'text-info emph' : getUser().attributes.username == score.attributes.user.attributes.username}">{{score.attributes.user.attributes.username}}</td>
+								<td ng-class="{'text-info emph' : getUser().attributes.username == score.attributes.user.attributes.username}">{{score.attributes.score}}</td>
+								<td ng-class="{'text-info emph' : getUser().attributes.username == score.attributes.user.attributes.username}">{{score.createdAt | date:'MM-d-yyyy'}}</td>
+							</tr>
+						</tbody>
+					</table>
+					<button class="btn" ng-click="pullScores(true)">Refresh Scores</button>
+					<img src="img/loading.gif" ng-show="loading" />
+					<br><br>
+					<div ng-show="marioerror" class="alert alert-error">
+					  <button type="button" class="close" ng-click="marioerror = false">&times;</button>
+					  <strong>Error</strong> {{errormessage}}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- Modal -->
+<div id="pageLeave" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<h3 id="myModalLabel">Are you sure?</h3>
+	</div>
+	<div class="modal-body">
+		<p>If you leave now, your scores won't be saved and you will lose your progress</p>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+		<button ng-show="!signingOut" ng-click="leave()" class="btn btn-danger">Leave Anyway</button>
+		<button ng-show="signingOut" ng-click="signout(true)" class="btn btn-danger">Sign Out Anyway</button>
+	</div>
+</div>

@@ -13,6 +13,7 @@ app.config(['$routeProvider', function($routeProvider,$locationProvider) {
   	  when('/signin', {templateUrl: 'html/signin.html', controller: SigninCtrl}).
   	  when('/account', {templateUrl: 'html/register.html', controller: RegisterCtrl}).
   	  when('/snake', {templateUrl: 'html/snake.html', controller: SnakeCtrl}).
+  	  when('/mario', {templateUrl: 'html/mario.html', controller: MarioCtrl}).
       otherwise({redirectTo: '/'});
 }]);
 
@@ -142,6 +143,22 @@ app.run(function($rootScope, $route) {
 		$rootScope.snakeBest = best;
 	}
 
+	// Mario Scores
+	$rootScope.marioScores = [];
+	$rootScope.marioBest = 0;
+	$rootScope.getMarioScores = function() {
+		return $rootScope.marioScores;
+	}
+	$rootScope.setMarioScores = function(scores) {
+		$rootScope.marioScores = scores;
+	}
+	$rootScope.getMarioBest = function() {
+		return $rootScope.marioBest;
+	}
+	$rootScope.setMarioBest = function(best) {
+		$rootScope.marioBest = best;
+	}
+
 	// Keep track of last page
 	$rootScope.lastPage = ''
 	$rootScope.getLastPage = function() {
@@ -173,6 +190,311 @@ function GamesCtrl($scope, $routeParams, $location) {
 }
 
 //*****************************************************************************
+//  MARIO CTRL
+//*****************************************************************************
+function MarioCtrl($scope, $routeParams, $location) {
+
+	$scope.setPageName('mario');
+
+	$scope.personalBest = 0;
+	$scope.scores = [];
+	$scope.loading = false;
+	$scope.setStillPlaying(false);
+
+	var MarioScore = Parse.Object.extend('MarioScore'); // For game scores
+
+	// Get high scores
+	$scope.pullScores = function(refresh) {
+
+		if (refresh || $scope.getMarioScores().length == 0) {
+
+			$scope.loading = true;
+			var query = new Parse.Query(MarioScore);
+			query.descending('score');
+			query.include('user');
+			query.limit(10);
+			query.find({
+				success:function(results) {
+					// Got top scores
+					$scope.loading = false;
+					if (results.length != 0) {
+						$scope.scores = results;
+						$scope.setMarioScores($scope.scores);
+					}
+					$scope.$apply();
+				},
+				error:function(error) {
+					// Error getting scores
+					$scope.loading = false;
+					$scope.marioerror = true;
+					$scope.errormessage = error.message;
+					$scope.$apply();
+				}
+			});
+			var pquery = new Parse.Query(MarioScore);
+			query.equalTo('user', $scope.getUser());
+			query.descending('score');
+			query.first({
+				success:function(result) {
+					// Got personal best
+					if (result) {
+						$scope.personalBest = result.attributes.score;
+						$scope.setMarioBest($scope.personalBest);
+						$scope.$apply();
+					}
+				},
+				error:function(error) {
+					// Error
+					$scope.marioerror = true;
+					$scope.errormessage = error.message;
+					$scope.$apply();
+				}
+			});
+
+		} else {
+
+			$scope.scores = $scope.getMarioScores();
+			$scope.personalBest = $scope.getMarioBest();
+		}
+	}
+
+	if ($scope.getLoggedInStatus()) {
+		$scope.pullScores(false);
+	}
+
+	// THIS CODE PREVENTS A PAGE CHANGE
+	$scope.readytoleave = false;
+	$scope.gotonext = '';
+
+	$scope.$on('$locationChangeStart', function(event, next, current){
+		if(!$scope.readytoleave && $scope.getLoggedInStatus() && $scope.getStillPlaying()) {
+		    event.preventDefault();
+		    $scope.gotonext = '#' + next.substring(next.indexOf('#') + 1);
+		    $('#pageLeave').modal('show');
+		}
+	});
+
+	$scope.leave = function() {
+		$('#pageLeave').on('hidden', function() {
+			window.location = $scope.gotonext;
+		});
+		$('#pageLeave').modal('hide');
+		$scope.readytoleave = true;
+		$scope.setStillPlaying(false);
+	}
+
+	// Angular ng-models
+	$scope.started = false;
+	$scope.gameover = false;
+	$scope.paused = false;
+	$scope.score = 0;
+	$scope.scoreToSave = false;
+
+	// Pause/Start gameplay
+	$scope.togglePlay = function() {
+
+		if ($scope.started) {
+
+			// Pause or unpause game
+			$scope.paused = !$scope.paused;
+
+			if ($scope.paused) {
+
+				clearTimeout(timer);
+
+			} else {
+
+				timer = setTimeout(gameLoop, GAME_SPEED);
+
+				// Reset save button
+				$('#savescorebutton').button('reset');
+			}
+
+		} else {
+
+			// Kick off initial start
+			$scope.started = true;
+			$scope.setStillPlaying(true);
+			startGame();
+		}
+	}
+
+	// Init Canvas
+	$scope.initCanvas = function() {
+		
+		// Set up canvas context
+		c = $('#mariocanvas')[0];
+		canvas = c.getContext('2d');
+
+		// Add event listeners
+		$(document).unbind('keydown');
+		$(document).bind('keydown',function(e){
+			if (e.which == KEYBOARD_DOWN) {
+				e.preventDefault();
+				console.log('down');
+			}
+			else if (e.which == KEYBOARD_UP) {
+				e.preventDefault();
+				console.log('up');
+			}
+		});
+		$(document).bind('keyup', function(e){
+			if (e.which == KEYBOARD_DOWN) {
+				e.preventDefault();
+				console.log('release down');
+			}
+			else if (e.which == KEYBOARD_UP) {
+				e.preventDefault();
+				console.log('release up');
+			}
+		});
+
+		// Draw initial game screen
+		// TODO
+		background = new Background();
+		mario = new Mario();
+		background.draw();
+		mario.draw();
+	}
+
+	// Save score
+	$scope.saveScore = function() {
+
+		// Make sure there is a score to save
+		if ($scope.scoreToSave) {
+
+			var marioscore = new SnakeScore();
+			marioscore.set('score', $scope.score);
+			marioscore.set('user', $scope.getUser());
+
+			$('#savescorebutton').button('loading');
+			marioscore.save(null,{
+				success: function(score) {
+					// Saved
+					$('#savescorebutton').button('complete');
+					$scope.scoreToSave = false;
+					$scope.setStillPlaying(false);
+					$scope.pullScores(true);
+					$scope.$apply();
+				},
+				error: function(score, error) {
+					// Error
+					$('#savescorebutton').button('complete');
+					$scope.scoreToSave = false;
+					$scope.$apply();
+				}
+			});
+		}
+	}
+
+	/////////////////
+	// Game values //
+	/////////////////
+	var c; 	//......................................// DOM element for canvas
+	var canvas;	//..................................// canvas context for drawing
+	var timer; //...................................// game timer
+	var KEYBOARD_UP = 38;	//......................// Define up key
+	var KEYBOARD_DOWN = 40;	//......................// Define down key
+	var GROUND_HEIGHT = 25; //......................// Define ground height
+	var BOARD_SIZE = 400; //........................// Define board size
+	var GAME_SPEED = 1000/60; //....................// 48 FPS
+
+	// Objects
+	var background;
+	var mario;
+
+	// Define background, and all its movement
+	function Background() {
+
+		// Ground
+		var ground = document.getElementById('marioground');
+		var groundwidth = 150;
+		var groundspeed = 1.5;
+		var groundcurposition = 0;
+		var groundminposition = -groundwidth;
+
+		// World
+		var world = document.getElementById('marioworld');
+		var worldwidth = 3000;
+		var worldspeed = 0.75;
+		var worldcurposition = 0;
+		var worldminposition = -worldwidth;
+		var worldyclip = 100;
+
+		this.draw = function() {
+
+			// temp light blue
+			canvas.fillStyle = '#bfeeff';
+			canvas.fillRect(0,0,BOARD_SIZE,BOARD_SIZE);
+
+			// world
+			canvas.drawImage(world, 0, worldyclip, worldwidth, BOARD_SIZE, worldcurposition, 0, worldwidth, BOARD_SIZE);
+			canvas.drawImage(world, 0, worldyclip, worldwidth, BOARD_SIZE, worldcurposition + worldwidth, 0, worldwidth, BOARD_SIZE);
+
+			// ground
+			canvas.drawImage(ground, groundcurposition, BOARD_SIZE - GROUND_HEIGHT, groundwidth, GROUND_HEIGHT);
+			canvas.drawImage(ground, groundcurposition + groundwidth, BOARD_SIZE - GROUND_HEIGHT, groundwidth, GROUND_HEIGHT);
+			canvas.drawImage(ground, groundcurposition + (groundwidth * 2), BOARD_SIZE - GROUND_HEIGHT, groundwidth, GROUND_HEIGHT);
+			canvas.drawImage(ground, groundcurposition + (groundwidth * 3), BOARD_SIZE - GROUND_HEIGHT, groundwidth, GROUND_HEIGHT);
+		}
+
+		this.move = function() {
+
+			groundcurposition -= groundspeed;
+			if (groundcurposition <= groundminposition) {
+				groundcurposition = 0;
+			}
+			worldcurposition -= worldspeed;
+			if (worldcurposition <= worldminposition) {
+				worldcurposition = 0;
+			}
+		}
+	}
+
+	function Mario() {
+
+		var marioWalkXCrop = 197;
+		var marioWalkYCrop = 48;
+		var marioWidth = 14;
+		var marioHeight = 27;
+		var MARIO_START_X = BOARD_SIZE / 3;
+		this.x = MARIO_START_X;
+		var MARIO_START_Y = BOARD_SIZE - (GROUND_HEIGHT + marioHeight);
+		this.y = MARIO_START_Y;
+		var mario = document.getElementById('mario');
+
+		this.draw = function() {
+
+			canvas.drawImage(mario, marioWalkXCrop, marioWalkYCrop, marioWidth, marioHeight, this.x, this.y, marioWidth, marioHeight);
+		}
+
+		this.move = function() {
+
+			this.x += 0.2;
+		}
+	}
+
+	// Setup game objects, start loop
+	function startGame() {
+
+		background = new Background();
+		mario = new Mario();
+		gameLoop();
+	}
+
+	// Game loop
+	function gameLoop() {
+
+		background.move();
+		background.draw();
+		mario.draw();
+		timer = setTimeout(gameLoop, GAME_SPEED);
+	}
+
+	setTimeout(function() { $scope.initCanvas(); }, 60);
+}
+
+//*****************************************************************************
 //  SNAKE CTRL
 //*****************************************************************************
 function SnakeCtrl($scope, $routeParams, $location) {
@@ -198,9 +520,11 @@ function SnakeCtrl($scope, $routeParams, $location) {
 			query.find({
 				success:function(results) {
 					// Got top scores
-					$scope.scores = results;
-					$scope.setSnakeScores($scope.scores);
 					$scope.loading = false;
+					if (results.length != 0) {
+						$scope.scores = results;
+						$scope.setSnakeScores($scope.scores);
+					}
 					$scope.$apply();
 				},
 				error:function(error) {
@@ -216,9 +540,11 @@ function SnakeCtrl($scope, $routeParams, $location) {
 			query.first({
 				success:function(result) {
 					// Got personal best
-					$scope.personalBest = result.attributes.score;
-					$scope.setSnakeBest($scope.personalBest);
-					$scope.$apply();
+					if (result) {
+						$scope.personalBest = result.attributes.score;
+						$scope.setSnakeBest($scope.personalBest);
+						$scope.$apply();
+					}
 				},
 				error:function(error) {
 					// Error
@@ -340,7 +666,9 @@ function SnakeCtrl($scope, $routeParams, $location) {
 		snake = new Snake();
 
 		// Add event listeners
-		$(document).keydown(function(e){
+		$(document).unbind('keydown');
+		$(document).bind('keydown', function(e){
+			console.log('snake');
 			if (e.which == KEYBOARD_RIGHT && snake.direction != LEFT) {
 				NEXT_DIRECTION = RIGHT;
 				e.preventDefault();
