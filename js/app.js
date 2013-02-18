@@ -315,7 +315,9 @@ function MarioCtrl($scope, $routeParams, $location) {
 
 			// Kick off initial start
 			$scope.started = true;
+			$scope.gameover = false;
 			$scope.setStillPlaying(true);
+			$scope.score = 0;
 			startGame();
 		}
 	}
@@ -378,6 +380,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 		// TODO
 		background = new Background();
 		mario = new Mario();
+		$scope.gameover = false;
 	}
 
 	// Save score
@@ -386,7 +389,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 		// Make sure there is a score to save
 		if ($scope.scoreToSave) {
 
-			var marioscore = new SnakeScore();
+			var marioscore = new MarioScore();
 			marioscore.set('score', $scope.score);
 			marioscore.set('user', $scope.getUser());
 
@@ -444,7 +447,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 		var world = new Image();
 		world.src = '../img/mario/marioworld.png';
 		var worldwidth = 3000;
-		var worldspeed = 0.75;
+		var worldspeed = 0.5;
 		var worldcurposition = 0;
 		var worldminposition = -worldwidth;
 		var worldyclip = 100;
@@ -494,6 +497,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 		var marioJumpXCrop = 271;
 		var marioCrouchXCrop = 379;
 		var marioPushXCrop = 252;
+		var marioDieXCrop = 679;
 		var marioCrouchYCrop = 57;
 		var marioImgWidth = 16;
 		var marioImgHeight = 27;
@@ -517,12 +521,14 @@ function MarioCtrl($scope, $routeParams, $location) {
 		this.movingUp = false;
 		this.doubleJumping = false;
 		this.inAir = false;
+		this.dying = false;
 		this.upVelocity = jumpSpeed;
 		this.decceleration = 0.18;
 		this.bounce = 2.5;
 		this.fallSpeed = 3;
 		this.normalHeight = marioHeight;
 		this.crouchHeight = marioCrouchHeight;
+		this.dieWidth = 26;
 		this.height = marioHeight;
 		this.width = marioWidth;
 
@@ -531,7 +537,9 @@ function MarioCtrl($scope, $routeParams, $location) {
 			if (this.crouching) {
 				canvas.drawImage(marioImg, marioCrouchXCrop, marioCrouchYCrop, marioImgWidth, marioCrouchImgHeight, this.x, this.y, this.width, this.height);
 			}
-			else if (this.inAir) {
+			else if (this.dying) {
+				canvas.drawImage(marioImg, marioDieXCrop, marioYCrop, this.dieWidth, marioImgHeight, this.x, this.y, this.dieWidth, this.height);
+			} else if (this.inAir) {
 				canvas.drawImage(marioImg, marioJumpXCrop, marioYCrop, marioImgWidth, marioImgHeight, this.x, this.y, this.width, this.height);
 			} else {
 				walkCount++;
@@ -546,19 +554,19 @@ function MarioCtrl($scope, $routeParams, $location) {
 
 		this.move = function() {
 
-			if (this.inAir) {
+			if (this.inAir || this.dying) {
 				this.y -= this.upVelocity;
 				this.upVelocity -= this.decceleration;
 			}
 
-			if (this.y > MARIO_START_Y && !this.crouching) {
+			if (this.y > MARIO_START_Y && !this.crouching && !this.dying) {
 				this.y = MARIO_START_Y;
 				this.upVelocity = jumpSpeed;
 				this.movingUp = false;
 				this.inAir = false;
 				this.doubleJumping = false;
 				this.canDoubleJump = false;
-			} else if (this.y > MARIO_START_Y + (marioHeight - marioCrouchHeight)) {
+			} else if (this.y > MARIO_START_Y + (marioHeight - marioCrouchHeight) && !this.dying) {
 				this.y = MARIO_START_Y + (marioHeight - marioCrouchHeight);
 				this.upVelocity = jumpSpeed;
 				this.movingUp = false;
@@ -781,6 +789,8 @@ function MarioCtrl($scope, $routeParams, $location) {
 
 		background = new Background();
 		mario = new Mario();
+		coins = [];
+		enemies = [];
 		document.getElementById('theme').load();
 		document.getElementById('theme').play();
 		gameLoop();
@@ -795,7 +805,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 	var speedUpMin = 1;
 	var curTime = Math.floor(Math.random() * (maxEnemyTime - minEnemyTime)) + minEnemyTime;
 	var enemyCounter = 0;
-	var totalKindsOfEnemy = 8;
+	var totalKindsOfEnemy = 11;
 	function createStuff() {
 
 		if (enemyCounter < curTime) {
@@ -818,10 +828,10 @@ function MarioCtrl($scope, $routeParams, $location) {
 					coin = new Coin();
 					break;
 				case 3:
-					enemy = new Pencil();
+					enemy = new Shell();
 					break;
 				case 4:
-					enemy = new Pencil();
+					enemy = new Spikes();
 					break;
 				case 5:
 					coin = new Coin();
@@ -831,6 +841,15 @@ function MarioCtrl($scope, $routeParams, $location) {
 					break;
 				case 7:
 					enemy = new Shell();
+					break;
+				case 8:
+					enemy = new Pencil();
+					break;
+				case 9:
+					enemy = new Pencil();
+					break;
+				case 10:
+					coin = new Coin();
 					break;
 				default:
 					enemy = new Spikes();
@@ -852,7 +871,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 	}
 
 	// Handle collisions with mario
-	var accuracy = 5;
+	var accuracy = 4;
 	function detectCollisions() {
 
 		// Go through each enemy, see if mario collides
@@ -871,7 +890,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 					if (cur.canBeKilled  || cur.canWalkOn) {
 
 						var bottom = mario.y + mario.height;
-						if (bottom - cur.y <= Math.abs(mario.upVelocity)) { // Use moving speed for accuracy tolerance
+						if (bottom - cur.y <= Math.abs(mario.upVelocity) || bottom - cur.y <= accuracy) { // Use moving speed for accuracy tolerance
 
 							if (cur.canBeKilled) {
 								mario.upVelocity = mario.bounce;
@@ -902,7 +921,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 					} else {
 
 						if (cur.canPushMario) {
-
+							// pipes ? maybe
 						}
 						else {
 
@@ -991,10 +1010,44 @@ function MarioCtrl($scope, $routeParams, $location) {
 			gameOver();
 	}
 
+	// mario die animation
+	function marioDie() {
+
+		console.log('draw die');
+		background.draw();
+		for (var i = enemies.length - 1; i >= 0; i--) {
+			enemies[i].draw();
+		};
+		for (var i = coins.length - 1; i >= 0; i--) {
+			coins[i].draw();
+		};
+		mario.move();
+		mario.draw();
+
+		if (mario.y < BOARD_SIZE) {
+			timer = setTimeout(marioDie, GAME_SPEED);
+		}
+		else {
+			$scope.started = false;
+			$scope.paused = false;
+			$scope.scoreToSave = true;
+			canvas.font = "32px Arial";
+			canvas.textAlign = 'center';
+			canvas.fillText("Game Over", 200,200);
+			canvas.font = "17px Arial";
+			$scope.$apply();
+		}
+	}
+
 	// End game
 	function gameOver() {
 
-
+		// Do something with Mario
+		// Draw Mario dying
+		mario.dying = true;
+		mario.upVelocity = mario.fallSpeed;
+		document.getElementById('theme').pause();
+		marioDie();
 	}
 
 	// init the canvas
@@ -1175,7 +1228,6 @@ function SnakeCtrl($scope, $routeParams, $location) {
 		// Add event listeners
 		$(document).unbind('keydown');
 		$(document).bind('keydown', function(e){
-			console.log('snake');
 			if (e.which == KEYBOARD_RIGHT && snake.direction != LEFT) {
 				NEXT_DIRECTION = RIGHT;
 				e.preventDefault();
