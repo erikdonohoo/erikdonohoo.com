@@ -3,10 +3,6 @@
 		border:5px double #aaa;
 		background:#fff;
 	}
-	.score-span {
-		margin-right:25px;
-		display:inline !important;
-	}
 	.score-span code {
 		font-size:22px;
 	}
@@ -20,11 +16,13 @@
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="span7">
-				<canvas id="mariocanvas" width="400" height="400"></canvas><br>
-				<button ng-show="paused || !started" class="btn btn-success" ng-click="togglePlay()">Start</button>
-				<button ng-show="started && !paused" class="btn btn-warning" ng-click="togglePlay()">Pause</button>
-				<button ng-class="{'btn-primary': scoreToSave, 'btn-link': !scoreToSave}" id="savescorebutton" data-loading-text="Saving..." data-complete-text="Score Saved!" ng-show="!paused && gameover && loggedIn && !started" ng-click="saveScore()" class="btn">Save that Score!</button>
-				<div class="span5 score-span pull-right text-right"><strong>SCORE: </strong><code>{{score | number:0}}</code></div>
+				<div style="width:400px">
+					<canvas id="mariocanvas" width="400" height="400"></canvas><br>
+					<button ng-show="paused || !started" class="btn btn-success" ng-click="togglePlay()">Start</button>
+					<button ng-show="started && !paused" class="btn btn-warning" ng-click="togglePlay()">Pause</button>
+					<button ng-class="{'btn-primary': scoreToSave, 'btn-link': !scoreToSave}" id="savescorebutton" data-loading-text="Saving..." data-complete-text="Score Saved!" ng-show="!paused && gameover && loggedIn && !started" ng-click="saveScore()" class="btn">Save that Score!</button>
+					<div class="span5 score-span pull-right text-right"><strong>SCORE: </strong><code>{{score | number:0}}</code></div>
+				</div>
 			</div>
 			<div class="span5">
 				<h4>About Mario</h4>
@@ -36,7 +34,7 @@
 					Use <span class="label label-info"><i class="icon-arrow-down"></i></span> to duck and slide while held
 				</p>
 				<p>
-					Kill enemies, earn extra lives, survive the onslaught and get as far as you can!
+					Kill enemies, survive the onslaught and get as far as you can!
 				</p>
 				<div ng-show="!loggedIn">
 					<p>

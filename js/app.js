@@ -797,6 +797,84 @@ function MarioCtrl($scope, $routeParams, $location) {
 		}
 	}
 
+	// Flying Koopa
+	var koopa = new Image();
+	koopa.src = '../img/mario/flyingkoop.png';
+	function Koopa() {
+
+		this.height = 40;
+		this.width = 40;
+		var speed = 3.3;
+		this.x = BOARD_SIZE;
+		this.y = Math.floor(Math.random() * (BOARD_SIZE/2)) + (BOARD_SIZE/4); // Top y
+		this.endy = Math.floor(Math.random() * (BOARD_SIZE * (1/4))) + ((BOARD_SIZE * (3/4)) - GROUND_HEIGHT); // Bottom y
+		this.endx = 0;
+		this.xpoint = BOARD_SIZE/2;
+
+		// Formula for parabola
+		// y = ax^2 + bx + c
+		// this.y = a(this.x)^2 + b(this.x) + c;
+		// this.y = a(0)^2 + b(0) + c;
+		// this.endy = a(this.xpoint)^2 + b(this.xpoint) + c;
+
+		// a(this.x^2) = -(this.endy*this.x/this.xpoint) + (a * this.xpoint * this.x) + (this.y*this.x/this.xpoint)
+		// a(this.x^2) - a*this.xpoint*this.x = -(this.endy*this.y)/this.xpoint + (this.y*this.x/this.xpoint);
+		// a(this.x^2 - (this.xpoint*this.x)) = -(this.endy*this.y)/this.xpoint + (this.y*this.x/this.xpoint);
+
+
+		// a(this.x)^2 - a*this.x*this.xpoint = (this.endy*this.x)/this.xpoint - (this.y*this.x)/this.xpoint - this.y;
+		// a(this.x^2 - (this.x*this.xpoint)) = (this.endy*this.x)/this.xpoint - (this.y*this.x)/this.xpoint - this.y;
+		// this.y = a(this.x)^2 + (this.endy*this.x)/this.xpoint - a*this.x*this.xpoint - (this.y*this.x)/this.xpoint
+
+		// var a = (-(this.endy*this.y)/this.xpoint + ((this.y*this.x)/this.xpoint))/(Math.pow(this.x,2) - (this.xpoint*this.x));
+		// var b = (this.endy/this.xpoint) - (a * this.xpoint) - (this.y/this.xpoint);
+		// var c = this.y;
+
+		// y = mx + b;
+		var m = (this.endy - this.y)/(this.endx - this.x);
+		// b = y - mx;
+		var lineb = this.y - m*this.x;
+
+		//console.log('x',this.x, 'y', this.y, 'lowy',this.endy, 'arc x',this.xpoint);
+
+		this.offScreen = false;
+		this.dying = false;
+		this.canBeKilled = true;
+		this.worth = 4;
+		this.fallSpeed = 4;
+
+		this.draw = function() {
+
+			if(this.dying) {
+				canvas.save();
+				canvas.translate(this.x, this.y + this.height);
+				canvas.scale(1,-1);
+				var oldx = this.x; var oldy = this.y;
+				this.x = 0;
+				this.y = 0;
+			}
+
+			canvas.drawImage(koopa, this.x, this.y, this.width, this.height);
+
+			if (this.dying) {
+				canvas.restore();
+				this.x = oldx; this.y = oldy;
+			}
+		}
+
+		this.move = function() {
+
+			this.x -= speed;
+			if (this.x + this.width < 0)
+				this.offScreen = true;
+
+			if (!this.dying)
+				this.y = m*this.x + lineb;
+			else
+				this.y += this.fallSpeed;
+		}
+	}
+
 	// Setup game objects, start loop
 	function startGame() {
 
@@ -818,7 +896,7 @@ function MarioCtrl($scope, $routeParams, $location) {
 	var speedUpMin = 2;
 	var curTime = Math.floor(Math.random() * (maxEnemyTime - minEnemyTime)) + minEnemyTime;
 	var enemyCounter = 0;
-	var totalKindsOfEnemy = 11;
+	var totalKindsOfEnemy = 16;
 	function createStuff() {
 
 		if (enemyCounter < curTime) {
@@ -841,10 +919,10 @@ function MarioCtrl($scope, $routeParams, $location) {
 					coin = new Coin();
 					break;
 				case 3:
-					enemy = new Shell();
+					enemy = new Spikes();
 					break;
 				case 4:
-					enemy = new Spikes();
+					enemy = new Shell();
 					break;
 				case 5:
 					coin = new Coin();
@@ -863,6 +941,21 @@ function MarioCtrl($scope, $routeParams, $location) {
 					break;
 				case 10:
 					coin = new Coin();
+					break;
+				case 11:
+					enemy = new Koopa();
+					break;
+				case 12:
+					enemy = new Koopa();
+					break;
+				case 13:
+					coin = new Coin();
+					break;
+				case 14:
+					coin = new Coin();
+					break;
+				case 15:
+					enemy = new Spikes();
 					break;
 				default:
 					enemy = new Spikes();

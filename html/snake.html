@@ -4,10 +4,6 @@
 		border:5px double #aaa;
 		background:#fff;
 	}
-	.score-span {
-		margin-right:50px;
-		display:inline !important;
-	}
 	.score-span code {
 		font-size:22px;
 	}
@@ -22,11 +18,13 @@
 	<div class="container-fluid">
 		<div class="row-fluid">
 			<div class="span7">
-				<canvas id="snakecanvas" width="384" height="384"></canvas><br>
-				<button ng-show="paused || !started" class="btn btn-success" ng-click="togglePlay()">Start</button>
-				<button ng-show="started && !paused" class="btn btn-warning" ng-click="togglePlay()">Pause</button>
-				<button ng-class="{'btn-primary': scoreToSave, 'btn-link': !scoreToSave}" id="savescorebutton" data-loading-text="Saving..." data-complete-text="Score Saved!" ng-show="!paused && gameover && loggedIn" ng-click="saveScore()" class="btn">Save that Score!</button>
-				<div class="span5 score-span pull-right text-right"><strong>SCORE: </strong><code>{{score | number:0}}</code></div>
+				<div style="width:384px">
+					<canvas id="snakecanvas" width="384" height="384"></canvas><br>
+					<button ng-show="paused || !started" class="btn btn-success" ng-click="togglePlay()">Start</button>
+					<button ng-show="started && !paused" class="btn btn-warning" ng-click="togglePlay()">Pause</button>
+					<button ng-class="{'btn-primary': scoreToSave, 'btn-link': !scoreToSave}" id="savescorebutton" data-loading-text="Saving..." data-complete-text="Score Saved!" ng-show="!paused && gameover && loggedIn" ng-click="saveScore()" class="btn">Save that Score!</button>
+					<div class="span5 score-span pull-right text-right"><strong>SCORE: </strong><code>{{score | number:0}}</code></div>
+				</div>
 			</div>
 			<div class="span5">
 				<h4>About Snake</h4>
